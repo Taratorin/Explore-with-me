@@ -15,8 +15,6 @@
 	<modules>
 		<module>stats</module>
 		<module>main-service</module>
-		<module>stats</module>
-		<module>main-service</module>
 	</modules>
 
 	<groupId>ru.practicum</groupId>
