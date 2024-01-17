@@ -22,7 +22,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=shareit
+      - POSTGRES_DB=stats-server-db
 
   ewm-service:
     build: main-service
@@ -46,4 +46,4 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=shareit
+      - POSTGRES_DB=ewm-db
