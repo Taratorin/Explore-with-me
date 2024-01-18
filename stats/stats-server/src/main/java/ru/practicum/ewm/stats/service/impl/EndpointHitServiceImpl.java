@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.ewm.stats.mapper.Formatter.DATE_TIME_FORMATTER;
-
 @Service
 @RequiredArgsConstructor
 public class EndpointHitServiceImpl implements EndpointHitService {
@@ -27,22 +25,20 @@ public class EndpointHitServiceImpl implements EndpointHitService {
     }
 
     @Override
-    public List<ViewStatsDto> getHit(String start, String end, String[] uris, boolean unique) {
-        LocalDateTime startTime = LocalDateTime.parse(start, DATE_TIME_FORMATTER);
-        LocalDateTime endTime = LocalDateTime.parse(end, DATE_TIME_FORMATTER);
+    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
         if (!unique) {
             if (uris != null) {
                 List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriAllIp(urisList, startTime, endTime);
+                return endpointHitRepository.findByUriAllIp(urisList, start, end);
             } else {
-                return endpointHitRepository.findByEmptyUriAllIp(startTime, endTime);
+                return endpointHitRepository.findByEmptyUriAllIp(start, end);
             }
         } else {
             if (uris != null) {
                 List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriDistinctIp(urisList, startTime, endTime);
+                return endpointHitRepository.findByUriDistinctIp(urisList, start, end);
             } else {
-                return endpointHitRepository.findByEmptyUriDistinctIp(startTime, endTime);
+                return endpointHitRepository.findByEmptyUriDistinctIp(start, end);
             }
         }
     }
