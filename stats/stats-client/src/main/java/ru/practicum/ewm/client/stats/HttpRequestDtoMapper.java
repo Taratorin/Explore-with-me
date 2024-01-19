@@ -1,4 +1,4 @@
-package ru.practicum.ewm.stats.mapper;
+package ru.practicum.ewm.client.stats;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.dto.stats.EndpointHitDto;
