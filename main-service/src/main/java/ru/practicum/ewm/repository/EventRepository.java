@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByInitiator(User user, Pageable pageable);
 
-    Optional<Event> findEventByIdAndInitiator(long eventId, User initiator);
+    Optional<Event> findEventById(long eventId);
 
-    void update(Event event2);
+    Optional<Event> findEventByIdAndInitiator(long eventId, User initiator);
 }
 

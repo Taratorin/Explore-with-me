@@ -38,8 +38,7 @@ public class EventPrivateController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEvent(@PathVariable long userId,
-                                 @PathVariable long eventId,
+    public EventFullDto getEvent(@PathVariable long userId, @PathVariable long eventId,
                                  HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение полной информации о событии, " +
                 "добавленном текущим пользователем");
@@ -53,6 +52,24 @@ public class EventPrivateController {
         log.info("Получен запрос " + request.getRequestURI() + " — изменение события, " +
                 "добавленного текущим пользователем");
         return eventService.patchEvent(userId, eventId, updateEventUserRequest);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public List<ParticipationRequestDto> getEventRequest(@PathVariable long userId, @PathVariable long eventId,
+                                                         HttpServletRequest request) {
+        log.info("Получен запрос " + request.getRequestURI() + " — получение информации о запросах на участие, " +
+                "в событии текущего пользователя");
+        return eventService.getEventRequests(userId, eventId);
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public EventRequestStatusUpdateResult patchEventRequests(
+            @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest,
+            @PathVariable long userId, @PathVariable long eventId,
+            HttpServletRequest request) {
+        log.info("Получен запрос " + request.getRequestURI() + " — изменение статуса заявок на участие, " +
+                "в событии текущего пользователя");
+        return eventService.patchEventRequests(userId, eventId, eventRequestStatusUpdateRequest);
     }
 
 }
