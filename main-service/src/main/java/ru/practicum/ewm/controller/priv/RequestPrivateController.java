@@ -3,12 +3,10 @@ package ru.practicum.ewm.controller.priv;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.dto.EventShortDto;
 import ru.practicum.ewm.dto.ParticipationRequestDto;
 import ru.practicum.ewm.service.ParticipationRequestService;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 import static ru.practicum.ewm.config.Constants.PRIVATE_CONTROLLER_PREFIX;

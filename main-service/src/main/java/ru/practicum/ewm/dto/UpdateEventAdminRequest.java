@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @EventDateValidByUpdate
-public class UpdateEventUserRequest {
+public class UpdateEventAdminRequest {
     @Length(min = 20, max = 2000)
     private String annotation;
     private Long category;

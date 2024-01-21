@@ -23,14 +23,19 @@ public class Event {
     private String description;
     private String annotation;
     private LocalDateTime eventDate;
-    private float locationLat;
-    private float locationLon;
-    private boolean paid;
-    private int participantLimit;
-    private boolean requestModeration;
+    private LocalDateTime createdOn;
+    private LocalDateTime publishedOn;
+    @OneToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
     private State state;
     private String title;
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
+    private Integer confirmedRequests;
+    private Integer views;
 }

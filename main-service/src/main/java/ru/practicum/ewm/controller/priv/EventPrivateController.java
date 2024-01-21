@@ -7,7 +7,6 @@ import ru.practicum.ewm.dto.*;
 import ru.practicum.ewm.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 import static ru.practicum.ewm.config.Constants.PRIVATE_CONTROLLER_PREFIX;
@@ -51,7 +50,7 @@ public class EventPrivateController {
                                    HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — изменение события, " +
                 "добавленного текущим пользователем");
-        return eventService.patchEvent(userId, eventId, updateEventUserRequest);
+        return eventService.patchEventUser(userId, eventId, updateEventUserRequest);
     }
 
     @GetMapping("/{eventId}/requests")

@@ -2,8 +2,10 @@ package ru.practicum.ewm.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class EventRequestStatusUpdateResult {
-    private ParticipationRequestDto confirmedRequests;
-    private ParticipationRequestDto rejectedRequests;
+    private List<ParticipationRequestDto> confirmedRequests;
+    private List<ParticipationRequestDto> rejectedRequests;
 }

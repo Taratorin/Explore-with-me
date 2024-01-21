@@ -1,16 +1,26 @@
 package ru.practicum.ewm.model;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import lombok.*;
+
+import javax.persistence.*;
 import java.util.Set;
 
+@Getter
+@Setter
+@ToString
+@Builder
+@Entity
+@Table(name = "compilations", schema = "public")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Compilation {
-    @ManyToMany
-    @JoinTable(
-            name = "book_authors",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private Set<Event> authors;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ElementCollection
+    @CollectionTable(name = "events_compilation", joinColumns = @JoinColumn(name = "compilation_id"))
+    @Column(name = "event_id")
+    private Set<Event> events;
+    private Boolean pinned;
+    private String title;
 }

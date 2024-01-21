@@ -30,7 +30,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = findEventById(eventId);
         requestValidation(event, requester);
         ParticipationRequest participationRequest = getParticipationRequest(requester, event);
-        if (!event.isRequestModeration()) {
+        if (!event.getRequestModeration()) {
             participationRequest.setStatus(Status.CONFIRMED);
         } else {
             participationRequest.setStatus(Status.PENDING);
@@ -64,7 +64,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (event.getInitiator() == requester) {
             throw new BadRequestException("Инициатор события не может добавить запрос на участие в своём событии");
         }
-        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEventAndStatus(event, State.PUBLISHED);
+        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEventAndStatus(event, Status.PENDING);
         if (participationRequestByEvent.size() >= event.getParticipantLimit()) {
             throw new BadRequestException("Достигнут лимит участников.");
         }
