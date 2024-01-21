@@ -1,14 +1,21 @@
 package ru.practicum.ewm.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.CategoryDto;
 import ru.practicum.ewm.dto.NewCategoryDto;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.model.Category;
+import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.repository.CategoryRepository;
 import ru.practicum.ewm.service.CategoryService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +47,23 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             throw new NotFoundException("Category with name " + name + " was not found");
         }
+    }
+
+    @Override
+    public List<CategoryDto> getCategoriesPublic(int from, int size) {
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        Page<Category> categories = categoryRepository.findAll(pageable);
+        return categories.stream()
+                .map(CategoryMapper.INSTANCE::categoryToCategoryDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryDto getCategoryByIdPublic(long catId) {
+        Category category = categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена."));
+        return CategoryMapper.INSTANCE.categoryToCategoryDto(category);
     }
 
     private void fixCategoryNameCase(NewCategoryDto newCategoryDto) {

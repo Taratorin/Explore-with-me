@@ -1,6 +1,9 @@
 package ru.practicum.ewm.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.CompilationDto;
 import ru.practicum.ewm.dto.NewCompilationDto;
@@ -12,7 +15,9 @@ import ru.practicum.ewm.service.CompilationService;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +43,22 @@ public class CompilationServiceImpl implements CompilationService {
         updateDestination(updateCompilationRequest, compilation);
         Compilation savedCompilation = compilationRepository.save(compilation);
         return CompilationMapper.INSTANCE.toCompilationDto(savedCompilation);
+    }
+
+    @Override
+    public List<CompilationDto> getCompilationsPublic(boolean pinned, int from, int size) {
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        Page<Compilation> compilations = compilationRepository.findByPinned(pinned, pageable);
+        return compilations.stream()
+                .map(CompilationMapper.INSTANCE::toCompilationDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CompilationDto getCompilationByIdPublic(long compId) {
+        Compilation compilation = getCompilationById(compId);
+        return CompilationMapper.INSTANCE.toCompilationDto(compilation);
     }
 
     private Compilation getCompilationById(Long compId) {

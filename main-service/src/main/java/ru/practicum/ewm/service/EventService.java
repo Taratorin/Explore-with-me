@@ -30,4 +30,5 @@ public interface EventService {
 
     List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, Boolean onlyAvailable, LocalDateTime rangeStart, LocalDateTime rangeEnd, SortType sort, int from, int size);
 
+    EventFullDto getEventPublic(long id);
 }

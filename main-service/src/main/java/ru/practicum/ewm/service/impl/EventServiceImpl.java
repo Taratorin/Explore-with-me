@@ -146,6 +146,12 @@ public class EventServiceImpl implements EventService {
         return eventShortDtos;
     }
 
+    @Override
+    public EventFullDto getEventPublic(long id) {
+        Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
+                .orElseThrow(() -> new NotFoundException("Опубликованное мероприятие с id=" + id + " не найдено."));
+        return EventMapper.INSTANCE.eventToEventFullDto(event);
+    }
 
     @Override
     public List<ParticipationRequestDto> getEventRequests(long userId, long eventId) {

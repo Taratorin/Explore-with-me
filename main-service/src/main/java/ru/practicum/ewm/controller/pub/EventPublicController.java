@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.ewm.config.Constants.APP_NAME;
-import static ru.practicum.ewm.config.Constants.PRIVATE_CONTROLLER_PREFIX;
 
 @RestController
 @RequestMapping(path = "/events")
@@ -44,7 +43,6 @@ public class EventPublicController {
     public EventFullDto getEventPublic(@PathVariable long id, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение подробной информации об " +
                 "опубликованном событии по его идентификатору");
-//        return eventService.getEventPublic(id);
-        return null;
+        return eventService.getEventPublic(id);
     }
 }
