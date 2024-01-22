@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class UpdateEventUserRequest {
     @Length(min = 20, max = 2000)
     private String annotation;
-    private Long category;
+    private Long categoryId;
     @Length(min = 20, max = 7000)
     private String description;
     private LocalDateTime eventDate;

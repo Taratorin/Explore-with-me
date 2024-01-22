@@ -261,8 +261,8 @@ public class EventServiceImpl implements EventService {
         if (!updateEventUserRequest.getAnnotation().equals(event.getAnnotation())) {
             event.setAnnotation(updateEventUserRequest.getAnnotation());
         }
-        if (!updateEventUserRequest.getCategory().equals(event.getCategory().getId())) {
-            event.setId(updateEventUserRequest.getCategory());
+        if (!updateEventUserRequest.getCategoryId().equals(event.getCategory().getId())) {
+            event.setId(updateEventUserRequest.getCategoryId());
         }
         if (!updateEventUserRequest.getDescription().equals(event.getDescription())) {
             event.setDescription(updateEventUserRequest.getDescription());

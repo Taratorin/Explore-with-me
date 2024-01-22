@@ -6,7 +6,7 @@ import lombok.Data;
 public class ParticipationRequestDto {
     private Long id;
     private String created;
-    private Long event;
-    private Long requester;
+    private Long eventId;
+    private Long requesterId;
     private String status;
 }

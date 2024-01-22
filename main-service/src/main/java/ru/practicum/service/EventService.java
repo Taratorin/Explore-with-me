@@ -1,6 +1,5 @@
 package ru.practicum.service;
 
-import io.micrometer.core.lang.Nullable;
 import ru.practicum.dto.*;
 import ru.practicum.model.SortType;
 import ru.practicum.model.State;
@@ -21,9 +20,9 @@ public interface EventService {
 
     EventRequestStatusUpdateResult patchEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
-    List<EventFullDto> findEventsByConditions(@Nullable List<Long> userIds,
-                                              @Nullable List<State> states, @Nullable List<Long> categories,
-                                              @Nullable LocalDateTime rangeStart, @Nullable LocalDateTime rangeEnd,
+    List<EventFullDto> findEventsByConditions(List<Long> userIds,
+                                              List<State> states, List<Long> categories,
+                                              LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                               int from, int size);
 
     EventFullDto patchEventAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest);

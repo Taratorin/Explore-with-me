@@ -7,7 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.UserDto;
 import ru.practicum.mapper.UserMapper;
-import ru.practicum.mapper.UserMapperImpl;
 import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.service.UserService;
@@ -23,14 +22,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto saveUser(UserDto userDto) {
+//        User user = UserMapperImpl.toUser(userDto);
 
-        User user = UserMapperImpl.toUser(userDto);
 
-//        User user = UserMapper.INSTANCE.userDtoToUser(userDto);
+        User user = UserMapper.INSTANCE.userDtoToUser(userDto);
         User savedUser = userRepository.save(user);
 
-        return UserMapperImpl.toUserDto(savedUser);
-//        return UserMapper.INSTANCE.userToUserDto(savedUser);
+//        return UserMapperImpl.toUserDto(savedUser);
+        return UserMapper.INSTANCE.userToUserDto(savedUser);
     }
 
     @Override
