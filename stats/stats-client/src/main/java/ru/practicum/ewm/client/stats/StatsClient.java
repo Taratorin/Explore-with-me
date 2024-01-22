@@ -13,7 +13,6 @@ import ru.practicum.ewm.stats.mapper.HttpRequestDtoMapper;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-@Service
 public class StatsClient extends BaseClient {
     private static final String API_PREFIX_POST = "/hit";
     private static final String API_PREFIX_GET = "/stats";
