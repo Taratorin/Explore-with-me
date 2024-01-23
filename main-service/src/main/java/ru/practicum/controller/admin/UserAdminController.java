@@ -10,8 +10,6 @@ import ru.practicum.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static ru.practicum.config.Constants.ADMIN_CONTROLLER_PREFIX;
-
 
 @RestController
 @RequestMapping(path = "/admin/users")

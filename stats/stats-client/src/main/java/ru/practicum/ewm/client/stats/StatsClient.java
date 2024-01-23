@@ -1,14 +1,11 @@
 package ru.practicum.ewm.client.stats;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.dto.stats.EndpointHitDto;
-import ru.practicum.ewm.dto.stats.HttpRequestDto;
-import ru.practicum.ewm.stats.mapper.HttpRequestDtoMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
