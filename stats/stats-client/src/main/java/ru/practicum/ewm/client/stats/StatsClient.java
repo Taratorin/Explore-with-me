@@ -11,23 +11,30 @@ import ru.practicum.ewm.dto.stats.HttpRequestDto;
 import ru.practicum.ewm.stats.mapper.HttpRequestDtoMapper;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.Map;
 
+@Service
 public class StatsClient extends BaseClient {
     private static final String API_PREFIX_POST = "/hit";
     private static final String API_PREFIX_GET = "/stats";
 
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(RestTemplateBuilder builder) {
         super(
                 builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+                        .uriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9090"))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                         .build()
         );
     }
 
-    public void saveHit(HttpRequestDto httpRequestDto) {
-        EndpointHitDto endpointHitDto = HttpRequestDtoMapper.toEndpointHitDto(httpRequestDto);
+    public void saveHit(HttpServletRequest request, String app, LocalDateTime ts) {
+        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
+                .ip(request.getRemoteAddr())
+                .uri(request.getRequestURI())
+                .app(app)
+                .timestamp(ts)
+                .build();
         post(API_PREFIX_POST, endpointHitDto);
     }
 
