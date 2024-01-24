@@ -31,10 +31,6 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "locations_id")
     private Location location;
-//    @Column(name = "location_lat")
-//    private float locationLat;
-//    @Column(name = "location_lon")
-//    private float locationLon;
     private Boolean paid;
     @Column(name = "participant_limit")
     private Integer participantLimit;

@@ -18,7 +18,6 @@ public class CheckEventDate implements ConstraintValidator<EventDateValid, NewEv
 
     @Override
     public boolean isValid(NewEventDto newEventDto, ConstraintValidatorContext constraintValidatorContext) {
-
         LocalDateTime eventDate = LocalDateTime.parse(newEventDto.getEventDate(), DATE_TIME_FORMATTER);
         if (eventDate == null) {
             return false;

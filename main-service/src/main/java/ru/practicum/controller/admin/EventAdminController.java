@@ -10,6 +10,7 @@ import ru.practicum.model.State;
 import ru.practicum.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +38,8 @@ public class EventAdminController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto patchEventAdmin(@RequestBody UpdateEventAdminRequest updateEventAdminRequest,
+
+    public EventFullDto patchEventAdmin(@Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
                                         @PathVariable long eventId, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — редактировавние данных события " +
                 "и его статуса (отклонение/публикация)");

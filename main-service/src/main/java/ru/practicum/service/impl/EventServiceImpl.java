@@ -20,8 +20,11 @@ import ru.practicum.service.EventService;
 import java.lang.reflect.Field;
 import java.rmi.registry.LocateRegistry;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.config.Constants.DATE_TIME_FORMATTER;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +86,7 @@ public class EventServiceImpl implements EventService {
 //        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
 //        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
         Event event = findEventById(eventId);
-        updateDestination(event, updateEventAdminRequest);
+        updateDestination(updateEventAdminRequest, event);
         if (StateAction.PUBLISH_EVENT.equals(updateEventAdminRequest.getStateAction()) &&
                 event.getState().equals(State.PENDING)) {
             event.setState(State.PUBLISHED);
@@ -332,6 +335,15 @@ public class EventServiceImpl implements EventService {
                     field.set(destination, fieldValue);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
+                }
+                if (field.getName().equals("eventDate")) {
+                    String eventDate = (String) mapFieldsValues.get("eventDate");
+                    LocalDateTime localDateTime = LocalDateTime.parse(eventDate, DATE_TIME_FORMATTER);
+                    try {
+                        field.set(destination, localDateTime);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

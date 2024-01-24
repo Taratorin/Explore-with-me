@@ -9,14 +9,14 @@ import ru.practicum.valid.EventDateValidByUpdate;
 import java.time.LocalDateTime;
 
 @Data
-@EventDateValidByUpdate
+//@EventDateValidByUpdate
 public class UpdateEventAdminRequest {
     @Length(min = 20, max = 2000)
     private String annotation;
     private Long category;
     @Length(min = 20, max = 7000)
     private String description;
-    private LocalDateTime eventDate;
+    private String eventDate;
     private Location location;
     private Boolean paid;
     private Integer participantLimit;

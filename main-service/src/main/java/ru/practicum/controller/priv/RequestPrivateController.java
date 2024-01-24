@@ -2,6 +2,7 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.service.ParticipationRequestService;
@@ -16,14 +17,15 @@ import static ru.practicum.config.Constants.PRIVATE_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestPrivateController {
+    //    todo delete DONE
     private final ParticipationRequestService participationRequestService;
 
-    @PostMapping("/eventId")
-    public ParticipationRequestDto saveParticipationRequest(@PathVariable long userId, @PathVariable long eventId,
-                                                            HttpServletRequest request) {
+    @PostMapping()
+    public ResponseEntity<ParticipationRequestDto> saveParticipationRequest(@PathVariable long userId, @RequestParam long eventId,
+                                                                            HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — добавление запроса от текущего пользователя" +
                 " на участие в событии");
-        return participationRequestService.saveParticipationRequest(userId, eventId);
+        return ResponseEntity.status(201).body(participationRequestService.saveParticipationRequest(userId, eventId));
     }
 
     @GetMapping()

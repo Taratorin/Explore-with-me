@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Data
 public class UpdateCompilationRequest {
-    private Set<Event> events;
+    private Set<Long> events;
     private Boolean pinned;
     private String title;
 }

@@ -51,6 +51,11 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto patchCompilation(UpdateCompilationRequest updateCompilationRequest, Long compId) {
         Compilation compilation = getCompilationById(compId);
+        Set<Long> eventIds = updateCompilationRequest.getEvents();
+        if (!eventIds.isEmpty()) {
+            List<Event> events = eventRepository.findAllById(eventIds);
+            compilation.setEvents(events);
+        }
         updateDestination(updateCompilationRequest, compilation);
         Compilation savedCompilation = compilationRepository.save(compilation);
         return CompilationMapper.INSTANCE.toCompilationDto(savedCompilation);

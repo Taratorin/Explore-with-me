@@ -19,10 +19,10 @@ import static ru.practicum.config.Constants.PRIVATE_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class EventPrivateController {
+//    todo delete DONE
     private final EventService eventService;
 
     @PostMapping()
-//    todo delete DONE
     public ResponseEntity<EventFullDto> saveNewEvent(@Valid @RequestBody NewEventDto newEventDto,
                                      @PathVariable long userId,
                                      HttpServletRequest request) {

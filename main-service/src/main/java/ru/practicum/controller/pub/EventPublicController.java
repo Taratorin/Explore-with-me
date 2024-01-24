@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
-import ru.practicum.ewm.client.stats.StatsClient;
+//import ru.practicum.ewm.client.stats.StatsClient;
 import ru.practicum.model.SortType;
 import ru.practicum.service.EventService;
 
@@ -23,7 +23,7 @@ import static ru.practicum.config.Constants.APP_NAME;
 @Slf4j
 public class EventPublicController {
     private final EventService eventService;
-    private final StatsClient statsClient;
+//    private final StatsClient statsClient;
 
     @GetMapping()
     public List<EventShortDto> getEventsPublic(
@@ -35,7 +35,7 @@ public class EventPublicController {
             @RequestParam(defaultValue = "10") int size, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение событий " +
                 "с возможностью фильтрации");
-        statsClient.saveHit(request, APP_NAME, LocalDateTime.now());
+//        statsClient.saveHit(request, APP_NAME, LocalDateTime.now());
         return eventService.getEventsPublic(text, categories, paid, onlyAvailable,
                 rangeStart, rangeEnd, sort, from, size);
     }

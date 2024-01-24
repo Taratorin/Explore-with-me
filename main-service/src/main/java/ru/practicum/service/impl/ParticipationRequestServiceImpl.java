@@ -55,7 +55,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (participationRequest.getRequester() != user) {
             throw new BadRequestException("Отменять можно только свои запросы на участие");
         }
-        participationRequest.setStatus(Status.PENDING);
+        participationRequest.setStatus(Status.CANCELED);
         ParticipationRequest canceledParticipationRequest = participationRequestRepository.save(participationRequest);
         return ParticipationRequestMapper.INSTANCE.participationRequestToParticipationRequestDto(canceledParticipationRequest);
     }
