@@ -8,36 +8,40 @@ import ru.practicum.dto.UserDto;
 import ru.practicum.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
+
+import static ru.practicum.config.Constants.ADMIN_CONTROLLER_PREFIX;
 
 
 @RestController
-@RequestMapping(path = "/admin/users")
+@RequestMapping(path = ADMIN_CONTROLLER_PREFIX + "/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserAdminController {
-
+//    todo delete DONE
     private final UserService userService;
 
     @PostMapping()
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto, HttpServletRequest request) {
+    public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — добавление пользователя");
         return ResponseEntity.status(201).body(userService.saveUser(userDto));
     }
 
     @GetMapping()
-    public List<UserDto> findUsers(@RequestParam List<Integer> ids,
-                                   @RequestParam(defaultValue = "0") int from,
-                                   @RequestParam(defaultValue = "10") int size,
-                                   HttpServletRequest request) {
+    public ResponseEntity<List<UserDto>> findUsers(@RequestParam List<Long> ids,
+                                                   @RequestParam(defaultValue = "0") int from,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение пользователей");
-        return userService.findUsers(ids, from, size);
+        return ResponseEntity.status(200).body(userService.findUsers(ids, from, size));
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable long userId, HttpServletRequest request) {
+    public ResponseEntity<?> deleteUser(@PathVariable long userId, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — удаление пользователя");
         userService.deleteUser(userId);
+        return ResponseEntity.status(204).body(null);
     }
 
 }

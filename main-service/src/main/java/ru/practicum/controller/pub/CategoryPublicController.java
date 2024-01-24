@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryPublicController {
+//    todo delete DONE
     private final CategoryService categoryService;
 
     @GetMapping()

@@ -14,12 +14,11 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.ParticipationRequestMapper;
 import ru.practicum.model.*;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.ParticipationRequestRepository;
-import ru.practicum.repository.UserRepository;
+import ru.practicum.repository.*;
 import ru.practicum.service.EventService;
 
 import java.lang.reflect.Field;
+import java.rmi.registry.LocateRegistry;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,10 +29,22 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
+    private final CategoryRepository categoryRepository;
+    private final LocationRepository locationRepository;
 
     @Override
     public EventFullDto saveNewEvent(NewEventDto newEventDto, long userId) {
+        User user = findUserById(userId);
+        Location location = locationRepository.save(newEventDto.getLocation());
         Event event = EventMapper.INSTANCE.newEventDtoToEvent(newEventDto);
+        event.setConfirmedRequests(0);
+        event.setLocation(location);
+        event.setInitiator(user);
+        event.setState(State.PENDING);
+        event.setCreatedOn(LocalDateTime.now());
+        event.setViews(0);
+        Optional<Category> optionalCategory = categoryRepository.findById(newEventDto.getCategory());
+        optionalCategory.ifPresent(event::setCategory);
         Event savedEvent = eventRepository.save(event);
         return EventMapper.INSTANCE.eventToEventFullDto(savedEvent);
     }
@@ -270,9 +281,9 @@ public class EventServiceImpl implements EventService {
         if (!updateEventUserRequest.getEventDate().equals(event.getEventDate())) {
             event.setEventDate(updateEventUserRequest.getEventDate());
         }
-        if (updateEventUserRequest.getLocation() != event.getLocation()) {
-            event.setLocation(updateEventUserRequest.getLocation());
-        }
+//        if (updateEventUserRequest.getLocation() != event.getLocation()) {
+//            event.setLocation(updateEventUserRequest.getLocation());
+//        }
         if (updateEventUserRequest.getPaid() && !event.getPaid()) {
             event.setPaid(updateEventUserRequest.getPaid());
         }

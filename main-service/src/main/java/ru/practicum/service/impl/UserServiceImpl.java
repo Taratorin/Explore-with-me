@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findUsers(List<Integer> ids, int from, int size) {
+    public List<UserDto> findUsers(List<Long> ids, int from, int size) {
         int pageNumber = from / size;
         Pageable pageable = PageRequest.of(pageNumber, size);
         List<User> users;

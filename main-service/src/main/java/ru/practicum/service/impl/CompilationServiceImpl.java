@@ -10,24 +10,34 @@ import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.model.Compilation;
+import ru.practicum.model.Event;
 import ru.practicum.model.UpdateCompilationRequest;
 import ru.practicum.repository.CompilationRepository;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CompilationService;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public CompilationDto saveCompilation(NewCompilationDto newCompilationDto) {
-        Compilation compilation = CompilationMapper.INSTANCE.toCompilation(newCompilationDto);
+        Set<Long> eventIds = newCompilationDto.getEvents();
+        List<Event> events = eventRepository.findAllById(eventIds);
+        Compilation compilation = Compilation.builder()
+                .events(events)
+                .pinned(newCompilationDto.getPinned())
+                .title(newCompilationDto.getTitle())
+                .build();
         Compilation savedCompilation = compilationRepository.save(compilation);
         return CompilationMapper.INSTANCE.toCompilationDto(savedCompilation);
     }

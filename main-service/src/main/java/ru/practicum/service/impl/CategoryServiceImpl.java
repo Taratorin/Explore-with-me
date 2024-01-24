@@ -36,16 +36,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto patchCategory(NewCategoryDto newCategoryDto) {
+    public CategoryDto patchCategory(NewCategoryDto newCategoryDto, Long catId) {
+        categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена."));
         fixCategoryNameCase(newCategoryDto);
-        String name = newCategoryDto.getName();
-        if (categoryRepository.existsByName(name)) {
-            Category category = CategoryMapper.INSTANCE.newCategoryDtoToCategory(newCategoryDto);
-            Category savedCategory = categoryRepository.save(category);
-            return CategoryMapper.INSTANCE.categoryToCategoryDto(savedCategory);
-        } else {
-            throw new NotFoundException("Category with name " + name + " was not found");
-        }
+        Category category = CategoryMapper.INSTANCE.newCategoryDtoToCategory(newCategoryDto);
+        Category savedCategory = categoryRepository.save(category);
+        return CategoryMapper.INSTANCE.categoryToCategoryDto(savedCategory);
     }
 
     @Override

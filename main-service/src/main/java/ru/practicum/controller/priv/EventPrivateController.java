@@ -2,11 +2,13 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
 import ru.practicum.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 import static ru.practicum.config.Constants.PRIVATE_CONTROLLER_PREFIX;
@@ -20,11 +22,12 @@ public class EventPrivateController {
     private final EventService eventService;
 
     @PostMapping()
-    public EventFullDto saveNewEvent(@RequestBody NewEventDto newEventDto,
+//    todo delete DONE
+    public ResponseEntity<EventFullDto> saveNewEvent(@Valid @RequestBody NewEventDto newEventDto,
                                      @PathVariable long userId,
                                      HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — добавление нового события");
-        return eventService.saveNewEvent(newEventDto, userId);
+        return ResponseEntity.status(201).body(eventService.saveNewEvent(newEventDto, userId));
     }
 
     @GetMapping()

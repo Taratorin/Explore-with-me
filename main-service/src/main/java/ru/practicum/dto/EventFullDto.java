@@ -1,5 +1,6 @@
 package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import ru.practicum.model.Location;
 
@@ -16,6 +17,7 @@ public class EventFullDto {
     private Location location;
     private boolean paid;
     private int participantLimit;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private String publishedOn;
     private boolean requestModeration;
     private String state;

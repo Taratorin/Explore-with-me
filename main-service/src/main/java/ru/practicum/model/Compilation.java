@@ -3,6 +3,7 @@ package ru.practicum.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -18,9 +19,9 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ElementCollection
-    @CollectionTable(name = "events_compilation", joinColumns = @JoinColumn(name = "compilation_id"))
-    @Column(name = "event_id")
-    private Set<Event> events;
+    @CollectionTable(name = "events_compilations", joinColumns = @JoinColumn(name = "compilation"))
+    @Column(name = "events_id")
+    private List<Event> events;
     private Boolean pinned;
     private String title;
 }

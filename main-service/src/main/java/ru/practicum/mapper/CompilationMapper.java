@@ -11,9 +11,5 @@ public interface CompilationMapper {
 
     CompilationMapper INSTANCE = Mappers.getMapper(CompilationMapper.class);
 
-
     CompilationDto toCompilationDto(Compilation compilation);
-
-    Compilation toCompilation(NewCompilationDto newCompilationDto);
-
 }
