@@ -23,6 +23,7 @@ public class CompilationAdminController {
     private final CompilationService compilationService;
 
     @PostMapping()
+//    todo delete DONE
     public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto,
                                                           HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — добавление новой подборки событий");
