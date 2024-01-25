@@ -4,12 +4,10 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.model.Location;
 import ru.practicum.model.StateAction;
-import ru.practicum.valid.EventDateValidByUpdate;
-
-import java.time.LocalDateTime;
+import ru.practicum.valid.EventDateValidByAdminUpdate;
 
 @Data
-//@EventDateValidByUpdate
+@EventDateValidByAdminUpdate
 public class UpdateEventAdminRequest {
     @Length(min = 20, max = 2000)
     private String annotation;

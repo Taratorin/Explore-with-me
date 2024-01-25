@@ -64,8 +64,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (event.getInitiator() == requester) {
             throw new BadRequestException("Инициатор события не может добавить запрос на участие в своём событии");
         }
-        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEventAndStatus(event, Status.PENDING);
-        if (participationRequestByEvent.size() >= event.getParticipantLimit()) {
+//        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEvent(event);
+        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
             throw new BadRequestException("Достигнут лимит участников.");
         }
         if (!event.getState().equals(State.PUBLISHED)) {

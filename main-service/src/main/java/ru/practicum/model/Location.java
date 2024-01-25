@@ -9,14 +9,14 @@ import java.util.Objects;
 @Setter
 @ToString
 @Builder
-@Entity
-@Table(name = "locations", schema = "public")
+//@Entity
+//@Table(name = "locations", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
     private Float lat;
     private Float lon;
 

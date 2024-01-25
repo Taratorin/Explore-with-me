@@ -19,7 +19,6 @@ import static ru.practicum.config.Constants.ADMIN_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryAdminController {
-//    todo delete DONE
     private final CategoryService categoryService;
 
     @PostMapping()

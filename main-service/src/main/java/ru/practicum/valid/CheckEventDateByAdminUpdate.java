@@ -9,19 +9,20 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.config.Constants.DATE_TIME_FORMATTER;
 
-public class CheckEventDateByUpdate implements ConstraintValidator<EventDateValidByUpdate, UpdateEventAdminRequest> {
+public class CheckEventDateByAdminUpdate implements ConstraintValidator<EventDateValidByAdminUpdate, UpdateEventAdminRequest> {
     private static final Long HOURS_VALID_AFTER_UPDATE = 2L;
 
     @Override
-    public void initialize(EventDateValidByUpdate constraintAnnotation) {
+    public void initialize(EventDateValidByAdminUpdate constraintAnnotation) {
     }
 
     @Override
     public boolean isValid(UpdateEventAdminRequest updateEventAdminRequest, ConstraintValidatorContext constraintValidatorContext) {
-        LocalDateTime eventDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), DATE_TIME_FORMATTER);
-        if (eventDate == null) {
+        String eventDateString = updateEventAdminRequest.getEventDate();
+        if (eventDateString == null) {
             return true;
         }
+        LocalDateTime eventDate = LocalDateTime.parse(eventDateString, DATE_TIME_FORMATTER);
         return eventDate.isAfter(LocalDateTime.now().plusHours(HOURS_VALID_AFTER_UPDATE));
     }
 }

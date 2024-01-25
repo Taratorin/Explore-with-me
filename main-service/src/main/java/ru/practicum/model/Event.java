@@ -28,20 +28,23 @@ public class Event {
     private LocalDateTime createdOn;
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
-    @ManyToOne
-    @JoinColumn(name = "locations_id")
-    private Location location;
+//    @ManyToOne
+//    @JoinColumn(name = "locations_id")
+//    private Location location;
+    private float lat;
+    private float lon;
     private Boolean paid;
     @Column(name = "participant_limit")
-    private Integer participantLimit;
+    private int participantLimit;
     @Column(name = "request_moderation")
     private Boolean requestModeration;
+    @Enumerated(EnumType.STRING)
     private State state;
     private String title;
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
     @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
-    private Integer views;
+    private int confirmedRequests;
+    private int views;
 }

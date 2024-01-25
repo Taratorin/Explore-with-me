@@ -26,7 +26,7 @@ public class EventAdminController {
 
     @GetMapping()
     public List<EventFullDto> getEvents(
-            @RequestParam(required = false) List<Long> userIds, @RequestParam(required = false) List<State> states,
+            @RequestParam(required = false) List<Long> users, @RequestParam(required = false) List<State> states,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
@@ -34,11 +34,10 @@ public class EventAdminController {
             HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение полной информации обо всех, " +
                 "событиях, подходящих под переданные условия");
-        return eventService.findEventsByConditions(userIds, states, categories, rangeStart, rangeEnd, from, size);
+        return eventService.findEventsByConditions(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/{eventId}")
-
     public EventFullDto patchEventAdmin(@Valid @RequestBody UpdateEventAdminRequest updateEventAdminRequest,
                                         @PathVariable long eventId, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — редактировавние данных события " +

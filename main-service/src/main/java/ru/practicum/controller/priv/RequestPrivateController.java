@@ -17,12 +17,12 @@ import static ru.practicum.config.Constants.PRIVATE_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestPrivateController {
-    //    todo delete DONE
     private final ParticipationRequestService participationRequestService;
 
     @PostMapping()
-    public ResponseEntity<ParticipationRequestDto> saveParticipationRequest(@PathVariable long userId, @RequestParam long eventId,
-                                                                            HttpServletRequest request) {
+    public ResponseEntity<ParticipationRequestDto> saveParticipationRequest(
+            @PathVariable long userId, @RequestParam long eventId,
+            HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — добавление запроса от текущего пользователя" +
                 " на участие в событии");
         return ResponseEntity.status(201).body(participationRequestService.saveParticipationRequest(userId, eventId));
@@ -30,7 +30,7 @@ public class RequestPrivateController {
 
     @GetMapping()
     public List<ParticipationRequestDto> getParticipationRequests(@PathVariable long userId,
-                                         HttpServletRequest request) {
+                                                                  HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение информации о заявках, " +
                 "текущего пользователя на участие в чужих событиях");
         return participationRequestService.getParticipationRequests(userId);
@@ -38,7 +38,7 @@ public class RequestPrivateController {
 
     @PatchMapping("/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(@PathVariable long userId, @PathVariable long requestId,
-                                                            HttpServletRequest request) {
+                                                              HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — отмена своего запроса на участие в событии");
         return participationRequestService.cancelParticipationRequest(userId, requestId);
     }

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
-//@EventDateValid
+@EventDateValid
 public class NewEventDto {
     @NotBlank
     @Length(min = 20, max = 2000)

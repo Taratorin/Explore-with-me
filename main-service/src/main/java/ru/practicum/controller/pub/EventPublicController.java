@@ -3,6 +3,7 @@ package ru.practicum.controller.pub;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.EventShortDto;
@@ -13,8 +14,6 @@ import ru.practicum.service.EventService;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.config.Constants.APP_NAME;
 
 
 @RestController
@@ -41,9 +40,9 @@ public class EventPublicController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventPublic(@PathVariable long id, HttpServletRequest request) {
+    public ResponseEntity<EventFullDto> getEventPublic(@PathVariable long id, HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — получение подробной информации об " +
                 "опубликованном событии по его идентификатору");
-        return eventService.getEventPublic(id);
+        return ResponseEntity.ok(eventService.getEventPublic(id));
     }
 }

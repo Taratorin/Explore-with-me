@@ -19,7 +19,6 @@ import static ru.practicum.config.Constants.ADMIN_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class UserAdminController {
-//    todo delete DONE
     private final UserService userService;
 
     @PostMapping()

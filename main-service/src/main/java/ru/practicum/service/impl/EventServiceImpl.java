@@ -33,15 +33,15 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
     private final CategoryRepository categoryRepository;
-    private final LocationRepository locationRepository;
 
     @Override
     public EventFullDto saveNewEvent(NewEventDto newEventDto, long userId) {
         User user = findUserById(userId);
-        Location location = locationRepository.save(newEventDto.getLocation());
+//        Location location = locationRepository.save(newEventDto.getLocation());
         Event event = EventMapper.INSTANCE.newEventDtoToEvent(newEventDto);
         event.setConfirmedRequests(0);
-        event.setLocation(location);
+        event.setLat(newEventDto.getLocation().getLat());
+        event.setLon(newEventDto.getLocation().getLon());
         event.setInitiator(user);
         event.setState(State.PENDING);
         event.setCreatedOn(LocalDateTime.now());
@@ -73,7 +73,14 @@ public class EventServiceImpl implements EventService {
         User initiator = findUserById(userId);
         Event event = findEventByIdAndUser(eventId, initiator);
         if (event.getState().equals(State.CANCELED) || event.getState().equals(State.PENDING)) {
-            updateEvent(updateEventUserRequest, event);
+            EventMapper.INSTANCE.updateEventFromDto(updateEventUserRequest, event);
+            StateAction stateAction = updateEventUserRequest.getStateAction();
+            if (stateAction != null && stateAction.equals(StateAction.CANCEL_REVIEW)) {
+                event.setState(State.CANCELED);
+            }
+            if (stateAction != null && stateAction.equals(StateAction.SEND_TO_REVIEW)) {
+                event.setState(State.PENDING);
+            }
             Event savedEvent = eventRepository.save(event);
             return EventMapper.INSTANCE.eventToEventFullDto(savedEvent);
         }
@@ -86,7 +93,13 @@ public class EventServiceImpl implements EventService {
 //        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
 //        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
         Event event = findEventById(eventId);
-        updateDestination(updateEventAdminRequest, event);
+        EventMapper.INSTANCE.updateEventFromDto(updateEventAdminRequest, event);
+        Long newCategory = updateEventAdminRequest.getCategory();
+        if (newCategory != null && event.getCategory().getId() != newCategory) {
+            Category category = categoryRepository.findById(newCategory)
+                    .orElseThrow(() -> new NotFoundException("Категория с id=" + newCategory + " не найдена."));
+            event.setCategory(category);
+        }
         if (StateAction.PUBLISH_EVENT.equals(updateEventAdminRequest.getStateAction()) &&
                 event.getState().equals(State.PENDING)) {
             event.setState(State.PUBLISHED);
@@ -103,7 +116,6 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
                                                Boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size) {
-//        todo можно ли как-то уменьшить количество параметров метода?
 //это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
 //текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
 //если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
@@ -115,19 +127,17 @@ public class EventServiceImpl implements EventService {
         query.from(event, request);
         List<BooleanExpression> conditions = new ArrayList<>();
         if (text != null) {
-            conditions.add(event.annotation.containsIgnoreCase(text));
-            conditions.add(event.description.containsIgnoreCase(text));
+            conditions.add(event.annotation.containsIgnoreCase(text).or(event.description.containsIgnoreCase(text)));
         }
         if (categories != null && !categories.isEmpty()) {
             conditions.add(event.category.id.in(categories));
         }
-        if (paid != null) {
-            conditions.add(event.paid.eq(paid));
+        if (paid) {
+            conditions.add(event.paid.eq(true));
         }
-        if (onlyAvailable != null) {
-//            todo как сформулировать условие
-//            BooleanExpression condition = event.participantLimit.gt(event.);
-//            conditions.add(condition);
+        if (onlyAvailable) {
+            conditions.add(event.confirmedRequests.lt(event.participantLimit));
+
         }
         if (rangeStart != null) {
             conditions.add(event.eventDate.after(rangeStart));
@@ -164,6 +174,9 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventPublic(long id) {
         Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованное мероприятие с id=" + id + " не найдено."));
+        int views = event.getViews();
+        event.setViews(views + 1);
+        eventRepository.save(event);
         return EventMapper.INSTANCE.eventToEventFullDto(event);
     }
 
@@ -201,16 +214,22 @@ public class EventServiceImpl implements EventService {
             if (!Status.PENDING.equals(participationRequest.getStatus())) {
                 throw new BadRequestException("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
             }
-            int confirmed = participationRequestRepository.findByEventAndStatus(event, Status.CONFIRMED).size();
+            int confirmed = event.getConfirmedRequests();
             if (Status.CONFIRMED.equals(statusToSet)) {
                 if (confirmed < event.getParticipantLimit()) {
-                    participationRequest.setStatus(statusToSet);
-                    result.getConfirmedRequests().add(ParticipationRequestMapper.INSTANCE.participationRequestToParticipationRequestDto(participationRequest));
+                    participationRequest.setStatus(Status.CONFIRMED);
+                    result.getConfirmedRequests()
+                            .add(ParticipationRequestMapper.INSTANCE
+                                    .participationRequestToParticipationRequestDto(participationRequest));
+                    event.setConfirmedRequests(confirmed++);
+                    eventRepository.save(event);
                     participationRequestRepository.save(participationRequest);
                 }
             } else {
                 participationRequest.setStatus(Status.REJECTED);
-                result.getRejectedRequests().add(ParticipationRequestMapper.INSTANCE.participationRequestToParticipationRequestDto(participationRequest));
+                result.getRejectedRequests()
+                        .add(ParticipationRequestMapper.INSTANCE
+                                .participationRequestToParticipationRequestDto(participationRequest));
                 participationRequestRepository.save(participationRequest);
 //                throw new BadRequestException("Уже достигнут лимит по заявкам на данное событие");
             }
@@ -219,13 +238,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventFullDto> findEventsByConditions(List<Long> userIds, List<State> states, List<Long> categories,
+    public List<EventFullDto> findEventsByConditions(List<Long> users, List<State> states, List<Long> categories,
                                                      LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                      int from, int size) {
         QEvent event = QEvent.event;
         List<BooleanExpression> conditions = new ArrayList<>();
-        if (userIds != null) {
-            conditions.add(event.initiator.id.in(userIds));
+        if (users != null) {
+            conditions.add(event.initiator.id.in(users));
         }
         if (states != null) {
             conditions.add(event.state.in(states));
@@ -234,7 +253,7 @@ public class EventServiceImpl implements EventService {
             conditions.add(event.eventDate.after(rangeStart));
         }
         if (rangeEnd != null) {
-            conditions.add(event.eventDate.before(rangeStart));
+            conditions.add(event.eventDate.before(rangeEnd));
         }
         int pageNumber = from / size;
         PageRequest pageRequest = PageRequest.of(pageNumber, size);
@@ -269,83 +288,5 @@ public class EventServiceImpl implements EventService {
     private Event findEventById(long eventId) {
         return eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new NotFoundException("Мероприятие с id=" + eventId + " не найдено."));
-    }
-
-    private void updateEvent(UpdateEventUserRequest updateEventUserRequest, Event event) {
-        if (!updateEventUserRequest.getAnnotation().equals(event.getAnnotation())) {
-            event.setAnnotation(updateEventUserRequest.getAnnotation());
-        }
-        if (!updateEventUserRequest.getCategoryId().equals(event.getCategory().getId())) {
-            event.setId(updateEventUserRequest.getCategoryId());
-        }
-        if (!updateEventUserRequest.getDescription().equals(event.getDescription())) {
-            event.setDescription(updateEventUserRequest.getDescription());
-        }
-        if (!updateEventUserRequest.getEventDate().equals(event.getEventDate())) {
-            event.setEventDate(updateEventUserRequest.getEventDate());
-        }
-//        if (updateEventUserRequest.getLocation() != event.getLocation()) {
-//            event.setLocation(updateEventUserRequest.getLocation());
-//        }
-        if (updateEventUserRequest.getPaid() && !event.getPaid()) {
-            event.setPaid(updateEventUserRequest.getPaid());
-        }
-        if (updateEventUserRequest.getParticipantLimit() != event.getParticipantLimit()) {
-            event.setParticipantLimit(updateEventUserRequest.getParticipantLimit());
-        }
-        if (updateEventUserRequest.getRequestModeration() && !event.getRequestModeration()) {
-            event.setRequestModeration(updateEventUserRequest.getRequestModeration());
-        }
-        if (updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW.toString())) {
-            event.setState(State.PENDING);
-        }
-        if (updateEventUserRequest.getStateAction().equals(StateAction.CANCEL_REVIEW.toString())) {
-            event.setState(State.CANCELED);
-        }
-        if (!updateEventUserRequest.getTitle().equals(event.getTitle())) {
-            event.setTitle(updateEventUserRequest.getTitle());
-        }
-    }
-
-    private void updateDestination(Object source, Object destination) {
-        Field[] fieldsSource = source.getClass().getDeclaredFields();
-        Map<String, Object> mapFieldsValues = new HashMap<>(fieldsSource.length);
-        Map<String, Object> mapFieldsTypes = new HashMap<>(fieldsSource.length);
-        for (Field field : fieldsSource) {
-            field.setAccessible(true);
-            String name = field.getName();
-            Class<?> type = field.getType();
-            Object o;
-            try {
-                o = field.get(source);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-            mapFieldsValues.put(name, o);
-            mapFieldsTypes.put(name, type);
-        }
-        Field[] fieldsDestination = destination.getClass().getDeclaredFields();
-        for (Field field : fieldsDestination) {
-            field.setAccessible(true);
-            String fieldDestinationName = field.getName();
-            Object fieldValue = mapFieldsValues.get(fieldDestinationName);
-            Object type = mapFieldsTypes.get(fieldDestinationName);
-            if (fieldValue != null && field.getType() == type) {
-                try {
-                    field.set(destination, fieldValue);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-                if (field.getName().equals("eventDate")) {
-                    String eventDate = (String) mapFieldsValues.get("eventDate");
-                    LocalDateTime localDateTime = LocalDateTime.parse(eventDate, DATE_TIME_FORMATTER);
-                    try {
-                        field.set(destination, localDateTime);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
     }
 }

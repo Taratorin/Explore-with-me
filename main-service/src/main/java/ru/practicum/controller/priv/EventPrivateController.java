@@ -19,7 +19,6 @@ import static ru.practicum.config.Constants.PRIVATE_CONTROLLER_PREFIX;
 @RequiredArgsConstructor
 @Slf4j
 public class EventPrivateController {
-//    todo delete DONE
     private final EventService eventService;
 
     @PostMapping()
@@ -49,7 +48,7 @@ public class EventPrivateController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto patchEvent(@RequestBody UpdateEventUserRequest updateEventUserRequest,
+    public EventFullDto patchEvent(@Valid @RequestBody UpdateEventUserRequest updateEventUserRequest,
                                    @PathVariable long userId, @PathVariable long eventId,
                                    HttpServletRequest request) {
         log.info("Получен запрос " + request.getRequestURI() + " — изменение события, " +
