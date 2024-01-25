@@ -113,8 +113,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid,
-                                               Boolean onlyAvailable, LocalDateTime rangeStart,
+    public List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid,
+                                               boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size) {
 //это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
 //текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв

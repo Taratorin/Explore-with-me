@@ -27,7 +27,7 @@ public interface EventService {
 
     EventFullDto patchEventAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 
-    List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, Boolean onlyAvailable, LocalDateTime rangeStart, LocalDateTime rangeEnd, SortType sort, int from, int size);
+    List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid, boolean onlyAvailable, LocalDateTime rangeStart, LocalDateTime rangeEnd, SortType sort, int from, int size);
 
     EventFullDto getEventPublic(long id);
 }

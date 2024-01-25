@@ -1,17 +1,18 @@
 package ru.practicum.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.model.Location;
 import ru.practicum.valid.EventDateValid;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Data
 @EventDateValid
+@NoArgsConstructor
 public class NewEventDto {
     @NotBlank
     @Length(min = 20, max = 2000)
