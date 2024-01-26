@@ -10,21 +10,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.*;
 import ru.practicum.exception.BadRequestException;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.ParticipationRequestMapper;
 import ru.practicum.model.*;
-import ru.practicum.repository.*;
+import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.ParticipationRequestRepository;
+import ru.practicum.repository.UserRepository;
 import ru.practicum.service.EventService;
 
-import java.lang.reflect.Field;
-import java.rmi.registry.LocateRegistry;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ru.practicum.config.Constants.DATE_TIME_FORMATTER;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto saveNewEvent(NewEventDto newEventDto, long userId) {
         User user = findUserById(userId);
-//        Location location = locationRepository.save(newEventDto.getLocation());
         Event event = EventMapper.INSTANCE.newEventDtoToEvent(newEventDto);
         event.setConfirmedRequests(0);
         event.setLat(newEventDto.getLocation().getLat());
@@ -72,27 +72,27 @@ public class EventServiceImpl implements EventService {
     public EventFullDto patchEventUser(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
         User initiator = findUserById(userId);
         Event event = findEventByIdAndUser(eventId, initiator);
-        if (event.getState().equals(State.CANCELED) || event.getState().equals(State.PENDING)) {
-            EventMapper.INSTANCE.updateEventFromDto(updateEventUserRequest, event);
-            StateAction stateAction = updateEventUserRequest.getStateAction();
-            if (stateAction != null && stateAction.equals(StateAction.CANCEL_REVIEW)) {
-                event.setState(State.CANCELED);
-            }
-            if (stateAction != null && stateAction.equals(StateAction.SEND_TO_REVIEW)) {
-                event.setState(State.PENDING);
-            }
-            Event savedEvent = eventRepository.save(event);
-            return EventMapper.INSTANCE.eventToEventFullDto(savedEvent);
+        if (event.getState().equals(State.PUBLISHED)) {
+            throw new ConflictException("Событие уже опубликовано.");
         }
+        EventMapper.INSTANCE.updateEventFromDto(updateEventUserRequest, event);
+        StateAction stateAction = updateEventUserRequest.getStateAction();
+        if (stateAction != null && stateAction.equals(StateAction.CANCEL_REVIEW)) {
+            event.setState(State.CANCELED);
+        }
+        if (stateAction != null && stateAction.equals(StateAction.SEND_TO_REVIEW)) {
+            event.setState(State.PENDING);
+        }
+        eventRepository.save(event);
         return EventMapper.INSTANCE.eventToEventFullDto(event);
     }
 
     @Override
     public EventFullDto patchEventAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-//        дата начала изменяемого события должна быть не ранее чем за час от даты публикации. (Ожидается код ошибки 409)
-//        событие можно публиковать, только если оно в состоянии ожидания публикации (Ожидается код ошибки 409)
-//        событие можно отклонить, только если оно еще не опубликовано (Ожидается код ошибки 409)
         Event event = findEventById(eventId);
+        if (event.getState().equals(State.PUBLISHED) || event.getState().equals(State.CANCELED)) {
+            throw new ConflictException("Событие уже опубликовано");
+        }
         EventMapper.INSTANCE.updateEventFromDto(updateEventAdminRequest, event);
         Long newCategory = updateEventAdminRequest.getCategory();
         if (newCategory != null && event.getCategory().getId() != newCategory) {
@@ -116,11 +116,10 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid,
                                                boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size) {
-//это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
-//текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
-//если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
-//информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-
+        List<Event> availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
+        if (availableEvents.isEmpty()) {
+            throw new BadRequestException("Event must be published");
+        }
         QEvent event = QEvent.event;
         QParticipationRequest request = QParticipationRequest.participationRequest;
         HibernateQuery<?> query = new HibernateQuery<Void>();
@@ -171,7 +170,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventPublic(long id) {
+    public EventFullDto findEventPublic(Long id) {
         Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованное мероприятие с id=" + id + " не найдено."));
         int views = event.getViews();
@@ -196,14 +195,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventRequestStatusUpdateResult patchEventRequests
             (long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        //        если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-        //        нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
-        //        статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
-        //        если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
         User initiator = findUserById(userId);
         Event event = findEventById(eventId);
         if (event.getInitiator() != initiator) {
             throw new BadRequestException("Для изменения статуса заявок вы должны быть инициатором события.");
+        }
+        if (event.getParticipantLimit() == event.getConfirmedRequests()) {
+            throw new ConflictException("Лимит подтверждённых заявок на мероприятие исчерпан.");
         }
         String statusString = eventRequestStatusUpdateRequest.getStatus();
         Status statusToSet = Status.valueOf(statusString);
@@ -212,7 +210,7 @@ public class EventServiceImpl implements EventService {
         List<ParticipationRequest> participationRequests = participationRequestRepository.findByEventAndIdIn(event, ids);
         for (ParticipationRequest participationRequest : participationRequests) {
             if (!Status.PENDING.equals(participationRequest.getStatus())) {
-                throw new BadRequestException("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
+                throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
             }
             int confirmed = event.getConfirmedRequests();
             if (Status.CONFIRMED.equals(statusToSet)) {
@@ -221,7 +219,7 @@ public class EventServiceImpl implements EventService {
                     result.getConfirmedRequests()
                             .add(ParticipationRequestMapper.INSTANCE
                                     .participationRequestToParticipationRequestDto(participationRequest));
-                    event.setConfirmedRequests(confirmed++);
+                    event.setConfirmedRequests(confirmed + 1);
                     eventRepository.save(event);
                     participationRequestRepository.save(participationRequest);
                 }
@@ -231,7 +229,6 @@ public class EventServiceImpl implements EventService {
                         .add(ParticipationRequestMapper.INSTANCE
                                 .participationRequestToParticipationRequestDto(participationRequest));
                 participationRequestRepository.save(participationRequest);
-//                throw new BadRequestException("Уже достигнут лимит по заявкам на данное событие");
             }
         }
         return result;

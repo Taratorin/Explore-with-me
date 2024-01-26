@@ -4,7 +4,6 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.model.Location;
 import ru.practicum.model.StateAction;
-import ru.practicum.valid.EventDateValidByAdminUpdate;
 import ru.practicum.valid.EventDateValidByUserUpdate;
 
 @Data

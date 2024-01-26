@@ -1,7 +1,6 @@
 package ru.practicum.valid;
 
 
-import ru.practicum.dto.UpdateEventAdminRequest;
 import ru.practicum.dto.UpdateEventUserRequest;
 
 import javax.validation.ConstraintValidator;

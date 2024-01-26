@@ -16,10 +16,8 @@ import ru.practicum.repository.CompilationRepository;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CompilationService;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,7 +30,12 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto saveCompilation(NewCompilationDto newCompilationDto) {
         Set<Long> eventIds = newCompilationDto.getEvents();
-        List<Event> events = eventRepository.findAllById(eventIds);
+        List<Event> events;
+        if (eventIds != null && !eventIds.isEmpty()) {
+            events = eventRepository.findAllById(eventIds);
+        } else {
+            events = new ArrayList<>();
+        }
         Compilation compilation = Compilation.builder()
                 .events(events)
                 .pinned(newCompilationDto.getPinned())
@@ -51,14 +54,23 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto patchCompilation(UpdateCompilationRequest updateCompilationRequest, Long compId) {
         Compilation compilation = getCompilationById(compId);
-        Set<Long> eventIds = updateCompilationRequest.getEvents();
-        if (!eventIds.isEmpty()) {
-            List<Event> events = eventRepository.findAllById(eventIds);
-            compilation.setEvents(events);
+        List<Long> eventIds = updateCompilationRequest.getEvents();
+        List<Event> events;
+        if (eventIds != null && !eventIds.isEmpty()) {
+            events = eventRepository.findAllById(eventIds);
+        } else {
+            events = new ArrayList<>();
         }
-        updateDestination(updateCompilationRequest, compilation);
-        Compilation savedCompilation = compilationRepository.save(compilation);
-        return CompilationMapper.INSTANCE.toCompilationDto(savedCompilation);
+        compilation.setEvents(events);
+        if (!(updateCompilationRequest.isPinned() && compilation.getPinned())) {
+            compilation.setPinned(updateCompilationRequest.isPinned());
+        }
+        if (updateCompilationRequest.getTitle() != null &&
+                !updateCompilationRequest.getTitle().equals(compilation.getTitle())) {
+            compilation.setTitle(updateCompilationRequest.getTitle());
+        }
+        compilationRepository.save(compilation);
+        return CompilationMapper.INSTANCE.toCompilationDto(compilation);
     }
 
     @Override
@@ -80,38 +92,5 @@ public class CompilationServiceImpl implements CompilationService {
     private Compilation getCompilationById(Long compId) {
         return compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Подборка с id=" + compId + " не найдена."));
-    }
-
-    private void updateDestination(Object source, Object destination) {
-        Field[] fieldsSource = source.getClass().getDeclaredFields();
-        Map<String, Object> mapFieldsValues = new HashMap<>(fieldsSource.length);
-        Map<String, Object> mapFieldsTypes = new HashMap<>(fieldsSource.length);
-        for (Field field : fieldsSource) {
-            field.setAccessible(true);
-            String name = field.getName();
-            Class<?> type = field.getType();
-            Object o;
-            try {
-                o = field.get(source);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-            mapFieldsValues.put(name, o);
-            mapFieldsTypes.put(name, type);
-        }
-        Field[] fieldsDestination = destination.getClass().getDeclaredFields();
-        for (Field field : fieldsDestination) {
-            field.setAccessible(true);
-            String fieldDestinationName = field.getName();
-            Object fieldValue = mapFieldsValues.get(fieldDestinationName);
-            Object type = mapFieldsTypes.get(fieldDestinationName);
-            if (fieldValue != null && field.getType() == type) {
-                try {
-                    field.set(destination, fieldValue);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 }

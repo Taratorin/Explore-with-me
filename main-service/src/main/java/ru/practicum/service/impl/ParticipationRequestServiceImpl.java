@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.exception.BadRequestException;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.ParticipationRequestMapper;
 import ru.practicum.model.*;
@@ -28,13 +29,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     public ParticipationRequestDto saveParticipationRequest(long userId, long eventId) {
         User requester = findUserById(userId);
         Event event = findEventById(eventId);
+        int confirmedRequests = event.getConfirmedRequests();
         requestValidation(event, requester);
         ParticipationRequest participationRequest = getParticipationRequest(requester, event);
-        if (!event.getRequestModeration()) {
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             participationRequest.setStatus(Status.CONFIRMED);
+            event.setConfirmedRequests(confirmedRequests + 1);
         } else {
             participationRequest.setStatus(Status.PENDING);
         }
+        eventRepository.save(event);
         ParticipationRequest savedParticipationRequest = participationRequestRepository.save(participationRequest);
         return ParticipationRequestMapper.INSTANCE.participationRequestToParticipationRequestDto(savedParticipationRequest);
     }
@@ -62,17 +66,17 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     private void requestValidation(Event event, User requester) {
         if (event.getInitiator() == requester) {
-            throw new BadRequestException("Инициатор события не может добавить запрос на участие в своём событии");
+            throw new ConflictException("Инициатор события не может добавить запрос на участие в своём событии");
         }
 //        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEvent(event);
-        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
-            throw new BadRequestException("Достигнут лимит участников.");
+        if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() == event.getParticipantLimit()) {
+            throw new ConflictException("Достигнут лимит участников.");
         }
         if (!event.getState().equals(State.PUBLISHED)) {
-            throw new BadRequestException("Нельзя участвовать в неопубликованном событии");
+            throw new ConflictException("Нельзя участвовать в неопубликованном событии");
         }
         if (findByRequesterAndEvent(requester, event).isPresent()) {
-            throw new BadRequestException("Нельзя добавить повторный запрос");
+            throw new ConflictException("Нельзя добавить повторный запрос");
         }
     }
 

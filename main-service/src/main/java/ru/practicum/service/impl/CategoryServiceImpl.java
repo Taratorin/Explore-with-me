@@ -7,10 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.NewCategoryDto;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.model.Category;
 import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CategoryService;
 
 import java.util.List;
@@ -20,27 +22,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public CategoryDto saveCategory(NewCategoryDto newCategoryDto) {
+        checkUniqueName(newCategoryDto);
         Category category = CategoryMapper.INSTANCE.newCategoryDtoToCategory(newCategoryDto);
         Category savedCategory = categoryRepository.save(category);
         return CategoryMapper.INSTANCE.categoryToCategoryDto(savedCategory);
     }
 
     @Override
-    // с категорией не должно быть связано ни одного события
-    // todo удалить все события перед удалением категории
     public void deleteCategory(long catId) {
+        if (eventRepository.existsByCategoryId(catId)) {
+            throw new ConflictException("The category is not empty");
+        }
         categoryRepository.deleteById(catId);
     }
 
     @Override
     public CategoryDto patchCategory(NewCategoryDto newCategoryDto, Long catId) {
-        categoryRepository.findById(catId)
+        Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена."));
-        fixCategoryNameCase(newCategoryDto);
-        Category category = CategoryMapper.INSTANCE.newCategoryDtoToCategory(newCategoryDto);
+        checkUniqueName(newCategoryDto, category);
+        CategoryMapper.INSTANCE.updateCategoryFromDto(newCategoryDto, category);
         Category savedCategory = categoryRepository.save(category);
         return CategoryMapper.INSTANCE.categoryToCategoryDto(savedCategory);
     }
@@ -62,10 +67,16 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.INSTANCE.categoryToCategoryDto(category);
     }
 
-    private void fixCategoryNameCase(NewCategoryDto newCategoryDto) {
-        String name = newCategoryDto.getName();
-        String firstLetter = String.valueOf(name.charAt(0));
-        String nameFixed = firstLetter + name.substring(1);
-        newCategoryDto.setName(nameFixed);
+    private void checkUniqueName(NewCategoryDto newCategoryDto, Category category) {
+        if (categoryRepository.existsByName(newCategoryDto.getName()) &&
+                !category.getName().equals(newCategoryDto.getName())) {
+            throw new ConflictException("Integrity constraint has been violated.");
+        }
+    }
+
+    private void checkUniqueName(NewCategoryDto newCategoryDto) {
+        if (categoryRepository.existsByName(newCategoryDto.getName())) {
+            throw new ConflictException("Integrity constraint has been violated.");
+        }
     }
 }

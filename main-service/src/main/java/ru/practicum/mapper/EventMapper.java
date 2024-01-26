@@ -8,8 +8,6 @@ import org.mapstruct.factory.Mappers;
 import ru.practicum.dto.*;
 import ru.practicum.model.Event;
 
-import static org.mapstruct.ReportingPolicy.IGNORE;
-
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EventMapper {
 

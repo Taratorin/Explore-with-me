@@ -3,7 +3,6 @@ package ru.practicum.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.dto.CompilationDto;
-import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.model.Compilation;
 
 @Mapper
