@@ -24,6 +24,7 @@ import ru.practicum.service.EventService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -95,7 +96,7 @@ public class EventServiceImpl implements EventService {
         }
         EventMapper.INSTANCE.updateEventFromDto(updateEventAdminRequest, event);
         Long newCategory = updateEventAdminRequest.getCategory();
-        if (newCategory != null && event.getCategory().getId() != newCategory) {
+        if (newCategory != null && !Objects.equals(event.getCategory().getId(), newCategory)) {
             Category category = categoryRepository.findById(newCategory)
                     .orElseThrow(() -> new NotFoundException("Категория с id=" + newCategory + " не найдена."));
             event.setCategory(category);
