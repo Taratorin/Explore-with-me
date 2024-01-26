@@ -18,32 +18,32 @@ public class ErrorHandler {
     @ExceptionHandler()
     public ResponseEntity<ApiError> handleConstraintViolationException(final ConstraintViolationException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        handleError result = getHandleError(e, httpStatus);
+        HandleError result = getHandleError(e, httpStatus);
         return ResponseEntity.status(result.httpStatus).body(result.error);
     }
 
     @ExceptionHandler()
     public ResponseEntity<ApiError> handleBadRequestException(final BadRequestException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        handleError result = getHandleError(e, httpStatus);
+        HandleError result = getHandleError(e, httpStatus);
         return ResponseEntity.status(result.httpStatus).body(result.error);
     }
 
     @ExceptionHandler()
     public ResponseEntity<ApiError> handleNotFoundException(final NotFoundException e) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        handleError result = getHandleError(e, httpStatus);
+        HandleError result = getHandleError(e, httpStatus);
         return ResponseEntity.status(result.httpStatus).body(result.error);
     }
 
     @ExceptionHandler()
     public ResponseEntity<ApiError> handleNotFoundException(final ConflictException e) {
         HttpStatus httpStatus = HttpStatus.CONFLICT;
-        handleError result = getHandleError(e, httpStatus);
+        HandleError result = getHandleError(e, httpStatus);
         return ResponseEntity.status(result.httpStatus).body(result.error);
     }
 
-    private static handleError getHandleError(Exception e, HttpStatus httpStatus) {
+    private static HandleError getHandleError(Exception e, HttpStatus httpStatus) {
         List<String> stackTraceElements = new ArrayList<>();
         for (StackTraceElement stackTraceElement : e.getStackTrace()) {
             stackTraceElements.add(stackTraceElement.toString());
@@ -53,14 +53,14 @@ public class ErrorHandler {
                 .message(e.getMessage())
                 .status(httpStatus)
                 .build();
-        return new handleError(httpStatus, error);
+        return new HandleError(httpStatus, error);
     }
 
-    private static class handleError {
+    private static class HandleError {
         public final HttpStatus httpStatus;
         public final ApiError error;
 
-        public handleError(HttpStatus httpStatus, ApiError error) {
+        public HandleError(HttpStatus httpStatus, ApiError error) {
             this.httpStatus = httpStatus;
             this.error = error;
         }

@@ -193,8 +193,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventRequestStatusUpdateResult patchEventRequests
-            (long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+    public EventRequestStatusUpdateResult patchEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         User initiator = findUserById(userId);
         Event event = findEventById(eventId);
         if (event.getInitiator() != initiator) {
