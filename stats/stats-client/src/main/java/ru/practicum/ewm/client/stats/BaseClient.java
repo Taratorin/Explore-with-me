@@ -11,7 +11,6 @@ import ru.practicum.ewm.dto.stats.ViewStatsDto;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class BaseClient {
     protected final RestTemplate rest;

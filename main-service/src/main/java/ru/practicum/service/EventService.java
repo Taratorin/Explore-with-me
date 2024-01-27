@@ -17,8 +17,6 @@ public interface EventService {
 
     EventFullDto patchEventUser(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest);
 
-    EventFullDto findEventPublicTest();
-
     List<ParticipationRequestDto> getEventRequests(long userId, long eventId);
 
     EventRequestStatusUpdateResult patchEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);

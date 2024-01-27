@@ -185,12 +185,6 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto findEventPublicTest() {
-        System.out.println("we are in the test method");
-        return new EventFullDto();
-    }
-
-    @Override
     public EventFullDto findEventPublic(Long id, HttpServletRequest httpServletRequest) {
         List<ViewStatsDto> viewStatsDtos = statsClient.get(httpServletRequest);
         Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
