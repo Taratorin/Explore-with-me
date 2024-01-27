@@ -29,16 +29,32 @@ public class EndpointHitServiceImpl implements EndpointHitService {
         if (!unique) {
             if (uris != null) {
                 List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriAllIp(urisList, start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByUriAllIp(urisList, start, end);
+                } else {
+                    return endpointHitRepository.findByUriAllIpWithoutDates(urisList);
+                }
             } else {
-                return endpointHitRepository.findByEmptyUriAllIp(start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByEmptyUriAllIp(start, end);
+                } else {
+                    return endpointHitRepository.findByEmptyUriAllIpWithoutDates();
+                }
             }
         } else {
             if (uris != null) {
                 List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriDistinctIp(urisList, start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByUriDistinctIp(urisList, start, end);
+                } else {
+                    return endpointHitRepository.findByUriDistinctIpWithoutDates(urisList);
+                }
             } else {
-                return endpointHitRepository.findByEmptyUriDistinctIp(start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByEmptyUriDistinctIp(start, end);
+                } else {
+                    return endpointHitRepository.findByEmptyUriDistinctIpWithoutDates();
+                }
             }
         }
     }

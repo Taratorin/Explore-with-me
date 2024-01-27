@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.*;
+import ru.practicum.ewm.client.stats.StatsClient;
+import ru.practicum.ewm.dto.stats.ViewStatsDto;
 import ru.practicum.exception.BadRequestException;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
@@ -21,12 +23,15 @@ import ru.practicum.repository.ParticipationRequestRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ru.practicum.config.Constants.APP_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,8 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
     private final CategoryRepository categoryRepository;
+    private final StatsClient statsClient;
+
 
     @Override
     public EventFullDto saveNewEvent(NewEventDto newEventDto, long userId) {
@@ -116,7 +123,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid,
                                                boolean onlyAvailable, LocalDateTime rangeStart,
-                                               LocalDateTime rangeEnd, SortType sort, int from, int size) {
+                                               LocalDateTime rangeEnd, SortType sort, int from, int size,
+                                               HttpServletRequest httpServletRequest) {
+        statsClient.saveHit(httpServletRequest, APP_NAME, LocalDateTime.now());
         List<Event> availableEvents;
         if (categories != null) {
             availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
@@ -176,12 +185,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto findEventPublic(Long id) {
+    public EventFullDto findEventPublicTest() {
+        System.out.println("we are in the test method");
+        return new EventFullDto();
+    }
+
+    @Override
+    public EventFullDto findEventPublic(Long id, HttpServletRequest httpServletRequest) {
+        List<ViewStatsDto> viewStatsDtos = statsClient.get(httpServletRequest);
         Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованное мероприятие с id=" + id + " не найдено."));
-        int views = event.getViews();
-        event.setViews(views + 1);
+        event.setViews(viewStatsDtos.size());
         eventRepository.save(event);
+        statsClient.saveHit(httpServletRequest, APP_NAME, LocalDateTime.now());
         return EventMapper.INSTANCE.eventToEventFullDto(event);
     }
 

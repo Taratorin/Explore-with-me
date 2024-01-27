@@ -4,6 +4,7 @@ import ru.practicum.dto.*;
 import ru.practicum.model.SortType;
 import ru.practicum.model.State;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface EventService {
 
     EventFullDto patchEventUser(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest);
 
+    EventFullDto findEventPublicTest();
+
     List<ParticipationRequestDto> getEventRequests(long userId, long eventId);
 
     EventRequestStatusUpdateResult patchEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
@@ -27,7 +30,7 @@ public interface EventService {
 
     EventFullDto patchEventAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 
-    List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid, boolean onlyAvailable, LocalDateTime rangeStart, LocalDateTime rangeEnd, SortType sort, int from, int size);
+    List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid, boolean onlyAvailable, LocalDateTime rangeStart, LocalDateTime rangeEnd, SortType sort, int from, int size, HttpServletRequest request);
 
-    EventFullDto findEventPublic(Long id);
+    EventFullDto findEventPublic(Long id, HttpServletRequest request);
 }

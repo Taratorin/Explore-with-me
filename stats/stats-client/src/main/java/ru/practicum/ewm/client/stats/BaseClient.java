@@ -1,13 +1,17 @@
 package ru.practicum.ewm.client.stats;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import ru.practicum.ewm.dto.stats.ViewStatsDto;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class BaseClient {
     protected final RestTemplate rest;
@@ -28,18 +32,20 @@ public class BaseClient {
         prepareResponse(serverResponse);
     }
 
-    public ResponseEntity<Object> get(String path, @Nullable Map<String, String[]> parameters) {
-        ResponseEntity<Object> serverResponse;
+    public List<ViewStatsDto> get(String path, @Nullable Map<String, String[]> parameters) {
+        ParameterizedTypeReference<List<ViewStatsDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<List<ViewStatsDto>> serverResponse;
         try {
             if (parameters != null) {
-                serverResponse = rest.exchange(path, HttpMethod.GET, null, Object.class, parameters);
+                serverResponse = rest.exchange(path, HttpMethod.GET, null, parameterizedTypeReference, parameters);
             } else {
-                serverResponse = rest.exchange(path, HttpMethod.GET, null, Object.class);
+                serverResponse = rest.exchange(path, HttpMethod.GET, null, parameterizedTypeReference);
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            throw new RuntimeException(e.getStatusText());
         }
-        return prepareResponse(serverResponse);
+        return serverResponse.getBody();
     }
 
     private static ResponseEntity<Object> prepareResponse(ResponseEntity<Object> response) {

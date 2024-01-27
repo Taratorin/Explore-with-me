@@ -7,9 +7,11 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewm.dto.stats.EndpointHitDto;
+import ru.practicum.ewm.dto.stats.ViewStatsDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -36,7 +38,7 @@ public class StatsClient extends BaseClient {
         post(API_PREFIX_POST, endpointHitDto);
     }
 
-    public ResponseEntity<Object> get(HttpServletRequest request) {
+    public List<ViewStatsDto> get(HttpServletRequest request) {
         Map<String, String[]> parameters = request.getParameterMap();
         return get(API_PREFIX_GET, parameters);
     }
