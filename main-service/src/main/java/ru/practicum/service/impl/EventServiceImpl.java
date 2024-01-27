@@ -117,7 +117,12 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, boolean paid,
                                                boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size) {
-        List<Event> availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
+        List<Event> availableEvents;
+        if (categories != null) {
+            availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
+        } else {
+            availableEvents = List.of();
+        }
         if (availableEvents.isEmpty()) {
             throw new BadRequestException("Event must be published");
         }
@@ -129,7 +134,7 @@ public class EventServiceImpl implements EventService {
         if (text != null) {
             conditions.add(event.annotation.containsIgnoreCase(text).or(event.description.containsIgnoreCase(text)));
         }
-        if (categories != null && !categories.isEmpty()) {
+        if (!categories.isEmpty()) {
             conditions.add(event.category.id.in(categories));
         }
         if (paid) {

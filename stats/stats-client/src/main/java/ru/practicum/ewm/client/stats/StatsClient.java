@@ -1,5 +1,6 @@
 package ru.practicum.ewm.client.stats;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -16,10 +17,10 @@ public class StatsClient extends BaseClient {
     private static final String API_PREFIX_POST = "/hit";
     private static final String API_PREFIX_GET = "/stats";
 
-    public StatsClient(RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9090"))
+                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                         .build()
         );

@@ -50,7 +50,7 @@ public class ErrorHandler {
         }
         ApiError error = ApiError.builder()
                 .errors(stackTraceElements)
-                .message(e.getMessage())
+                .message(e.getLocalizedMessage())
                 .status(httpStatus)
                 .build();
         return new HandleError(httpStatus, error);
