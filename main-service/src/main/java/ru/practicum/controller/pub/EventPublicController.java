@@ -45,7 +45,6 @@ public class EventPublicController {
         log.info("Получен запрос " + request.getRequestURI() + " — получение подробной информации об " +
                 "опубликованном событии по его идентификатору");
         statsClient.saveHit(request, APP_NAME, LocalDateTime.now());
-        eventService.findEventPublic(id);
-        return new EventFullDto();
+        return eventService.findEventPublic(id);
     }
 }
