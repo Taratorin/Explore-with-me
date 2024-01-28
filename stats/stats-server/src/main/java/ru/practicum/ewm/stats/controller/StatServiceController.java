@@ -27,7 +27,7 @@ public class StatServiceController {
     @GetMapping("/stats")
     public List<ViewStatsDto> getHit(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                     @RequestParam(required = false) String[] uris,
+                                     @RequestParam(required = false) List<String> uris,
                                      @RequestParam(required = false, defaultValue = "false") boolean unique) {
         log.info("Получен запрос GET /stats — получение сведений о статистике");
         return endpointHitService.getHit(start, end, uris, unique);

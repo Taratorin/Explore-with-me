@@ -37,8 +37,7 @@ public class StatsClient extends BaseClient {
         post(API_PREFIX_POST, endpointHitDto);
     }
 
-    public List<ViewStatsDto> get(HttpServletRequest request) {
-        Map<String, String[]> parameters = request.getParameterMap();
-        return get(API_PREFIX_GET, parameters);
+    public List<ViewStatsDto> get(HttpServletRequest request, Map<String, String> parameters) {
+        return get(API_PREFIX_GET + "?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 }

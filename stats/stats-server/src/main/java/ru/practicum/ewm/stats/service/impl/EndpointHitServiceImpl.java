@@ -10,7 +10,6 @@ import ru.practicum.ewm.stats.mapper.EndpointHitMapper;
 import ru.practicum.ewm.stats.service.EndpointHitService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,14 +24,13 @@ public class EndpointHitServiceImpl implements EndpointHitService {
     }
 
     @Override
-    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (!unique) {
             if (uris != null) {
-                List<String> urisList = new ArrayList<>(List.of(uris));
                 if (start != null) {
-                    return endpointHitRepository.findByUriAllIp(urisList, start, end);
+                    return endpointHitRepository.findByUriAllIp(uris, start, end);
                 } else {
-                    return endpointHitRepository.findByUriAllIpWithoutDates(urisList);
+                    return endpointHitRepository.findByUriAllIpWithoutDates(uris);
                 }
             } else {
                 if (start != null) {
@@ -43,11 +41,10 @@ public class EndpointHitServiceImpl implements EndpointHitService {
             }
         } else {
             if (uris != null) {
-                List<String> urisList = new ArrayList<>(List.of(uris));
                 if (start != null) {
-                    return endpointHitRepository.findByUriDistinctIp(urisList, start, end);
+                    return endpointHitRepository.findByUriDistinctIp(uris, start, end);
                 } else {
-                    return endpointHitRepository.findByUriDistinctIpWithoutDates(urisList);
+                    return endpointHitRepository.findByUriDistinctIpWithoutDates(uris);
                 }
             } else {
                 if (start != null) {
@@ -58,4 +55,31 @@ public class EndpointHitServiceImpl implements EndpointHitService {
             }
         }
     }
+
+//    @Override
+//    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+//        QEndpointHit endpointHit = QEndpointHit.endpointHit;
+//        List<BooleanExpression> conditions = new ArrayList<>();
+//        if (start != null) {
+//            conditions.add(endpointHit.ts.after(start));
+//        }
+//        if (end != null) {
+//            conditions.add(endpointHit.ts.before(start));
+//        }
+//        if (uris != null) {
+//            conditions.add(endpointHit.uri.in(uris));
+//        }
+//        if (unique) {
+//            conditions.add(endpointHit.ip.);
+//        }
+//
+//
+//        Optional<BooleanExpression> optionalCondition = conditions.stream().reduce(BooleanExpression::and);
+//        if (optionalCondition.isPresent()) {
+//            BooleanExpression finalCondition = optionalCondition.get();
+//            Iterable<EndpointHit> endpointHits = endpointHitRepository.findAll(finalCondition);
+//            List<ViewStatsDto> ViewStatsDto = new ArrayList<>();
+//
+//        }
+//    }
 }

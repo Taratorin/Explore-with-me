@@ -15,4 +15,5 @@ public class EndpointHitMapper {
                 .ts(endpointHitDto.getTimestamp())
                 .build();
     }
+
 }

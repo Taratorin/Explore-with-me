@@ -25,10 +25,7 @@ import ru.practicum.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.practicum.config.Constants.APP_NAME;
@@ -186,11 +183,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto findEventPublic(Long id, HttpServletRequest httpServletRequest) {
-        List<ViewStatsDto> viewStatsDtos = statsClient.get(httpServletRequest);
         Event event = eventRepository.findByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованное мероприятие с id=" + id + " не найдено."));
-        event.setViews(viewStatsDtos.size());
-        eventRepository.save(event);
+        Map<String, String> parameters = getParameters(httpServletRequest);
+        List<ViewStatsDto> viewStatsDtos = statsClient.get(httpServletRequest, parameters);
+        if (viewStatsDtos.isEmpty()) {
+            event.setViews(0L);
+        } else {
+            event.setViews(viewStatsDtos.get(0).getHits());
+        }
         statsClient.saveHit(httpServletRequest, APP_NAME, LocalDateTime.now());
         return EventMapper.INSTANCE.eventToEventFullDto(event);
     }
@@ -300,5 +301,14 @@ public class EventServiceImpl implements EventService {
     private Event findEventById(long eventId) {
         return eventRepository.findEventById(eventId)
                 .orElseThrow(() -> new NotFoundException("Мероприятие с id=" + eventId + " не найдено."));
+    }
+
+    private Map<String, String> getParameters(HttpServletRequest httpServletRequest) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("start", "1000-01-01 00:00:00");
+        parameters.put("end", "3000-01-01 00:00:00");
+        parameters.put("uris", httpServletRequest.getRequestURI());
+        parameters.put("unique", "true");
+        return parameters;
     }
 }

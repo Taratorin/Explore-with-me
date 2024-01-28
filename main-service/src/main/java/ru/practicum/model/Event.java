@@ -46,5 +46,5 @@ public class Event {
     private User initiator;
     @Column(name = "confirmed_requests")
     private int confirmedRequests;
-    private int views;
+    private long views;
 }

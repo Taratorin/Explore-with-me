@@ -31,7 +31,7 @@ public class BaseClient {
         prepareResponse(serverResponse);
     }
 
-    public List<ViewStatsDto> get(String path, @Nullable Map<String, String[]> parameters) {
+    public List<ViewStatsDto> get(String path, @Nullable Map<String, String> parameters) {
         ParameterizedTypeReference<List<ViewStatsDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {
         };
         ResponseEntity<List<ViewStatsDto>> serverResponse;
