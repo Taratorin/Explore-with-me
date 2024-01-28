@@ -16,4 +16,13 @@ public class EndpointHitMapper {
                 .build();
     }
 
+    public static EndpointHitDto toEndpointHitDto(EndpointHit endpointHit) {
+        return EndpointHitDto.builder()
+                .app(endpointHit.getApp())
+                .uri(endpointHit.getUri())
+                .ip(endpointHit.getIp())
+                .timestamp(endpointHit.getTs())
+                .build();
+    }
+
 }
