@@ -145,10 +145,6 @@ public class EventServiceImpl implements EventService {
         if (paid) {
             conditions.add(event.paid.eq(true));
         }
-//        todo correct this
-//        if (onlyAvailable) {
-//            conditions.add(event.confirmedRequests.lt(event.participantLimit));
-//        }
         if (rangeStart != null) {
             conditions.add(event.eventDate.after(rangeStart));
         }
@@ -172,7 +168,16 @@ public class EventServiceImpl implements EventService {
         PageRequest pageRequest = PageRequest.of(pageNumber, size, sortBy);
         Optional<BooleanExpression> optionalCondition = conditions.stream().reduce(BooleanExpression::and);
         BooleanExpression finalCondition = optionalCondition.get();
-        Iterable<Event> events = eventRepository.findAll(finalCondition, pageRequest);
+        Page<Event> eventsPage = eventRepository.findAll(finalCondition, pageRequest);
+        List<Event> events = eventsPage.stream().collect(Collectors.toList());
+        if (onlyAvailable) {
+            for (Event e : events) {
+                Integer confirmedRequests = participationRequestRepository.countConfirmedRequests(e.getId());
+                if (confirmedRequests == e.getParticipantLimit()) {
+                    events.remove(e);
+                }
+            }
+        }
         List<EventShortDto> eventShortDtos = new ArrayList<>();
         for (Event e : events) {
             eventShortDtos.add(EventMapper.INSTANCE.eventToEventShortDto(e));
