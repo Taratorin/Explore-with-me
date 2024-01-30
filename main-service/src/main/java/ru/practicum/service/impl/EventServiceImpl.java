@@ -121,7 +121,6 @@ public class EventServiceImpl implements EventService {
                                                boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size,
                                                HttpServletRequest httpServletRequest) {
-        statsClient.saveHit(httpServletRequest, LocalDateTime.now());
         List<Event> availableEvents;
         if (categories != null) {
             availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
@@ -182,6 +181,7 @@ public class EventServiceImpl implements EventService {
         for (Event e : events) {
             eventShortDtos.add(EventMapper.INSTANCE.eventToEventShortDto(e));
         }
+        statsClient.saveHit(httpServletRequest, LocalDateTime.now());
         return eventShortDtos;
     }
 
@@ -299,7 +299,6 @@ public class EventServiceImpl implements EventService {
                 confirmed = 0;
             }
             event.setConfirmedRequests(confirmed);
-            statsClient.saveHit(request, event.getUri(), LocalDateTime.now());
         }
         return events.stream()
                 .map(EventMapper.INSTANCE::eventToEventFullDto)
