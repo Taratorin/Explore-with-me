@@ -2,7 +2,7 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.service.ParticipationRequestService;
@@ -20,27 +20,27 @@ public class RequestPrivateController {
     private final ParticipationRequestService participationRequestService;
 
     @PostMapping()
-    public ResponseEntity<ParticipationRequestDto> saveParticipationRequest(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ParticipationRequestDto saveParticipationRequest(
             @PathVariable long userId, @RequestParam long eventId,
             HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — добавление запроса от текущего пользователя" +
-                " на участие в событии");
-        return ResponseEntity.status(201).body(participationRequestService.saveParticipationRequest(userId, eventId));
+        log.info("Получен запрос {} — добавление запроса от текущего пользователя" +
+                " на участие в событии", request.getRequestURI());
+        return participationRequestService.saveParticipationRequest(userId, eventId);
     }
 
     @GetMapping()
     public List<ParticipationRequestDto> getParticipationRequests(@PathVariable long userId,
                                                                   HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — получение информации о заявках, " +
-                "текущего пользователя на участие в чужих событиях");
+        log.info("Получен запрос {} — получение информации о заявках, " +
+                "текущего пользователя на участие в чужих событиях", request.getRequestURI());
         return participationRequestService.getParticipationRequests(userId);
     }
 
     @PatchMapping("/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(@PathVariable long userId, @PathVariable long requestId,
                                                               HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — отмена своего запроса на участие в событии");
+        log.info("Получен запрос {} — отмена своего запроса на участие в событии", request.getRequestURI());
         return participationRequestService.cancelParticipationRequest(userId, requestId);
     }
-
 }

@@ -2,20 +2,17 @@ package ru.practicum.model;
 
 import lombok.*;
 
+import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @Getter
 @Setter
 @ToString
 @Builder
-//@Entity
-//@Table(name = "locations", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
+@Embeddable
 public class Location {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
     private Float lat;
     private Float lon;
 

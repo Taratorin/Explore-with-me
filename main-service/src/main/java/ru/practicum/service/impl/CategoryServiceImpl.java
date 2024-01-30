@@ -68,8 +68,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void checkUniqueName(NewCategoryDto newCategoryDto, Category category) {
-        if (categoryRepository.existsByName(newCategoryDto.getName()) &&
-                !category.getName().equals(newCategoryDto.getName())) {
+        if (!category.getName().equals(newCategoryDto.getName()) &&
+                categoryRepository.existsByName(newCategoryDto.getName())) {
             throw new ConflictException("Integrity constraint has been violated.");
         }
     }

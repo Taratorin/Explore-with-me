@@ -12,8 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(ElementType.TYPE_USE)
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = CheckEventDateByAdminUpdate.class)
-public @interface EventDateValidByAdminUpdate {
+@Constraint(validatedBy = CheckEventDateByUpdate.class)
+public @interface EventDateValidByUpdate {
     String message() default "Event date must be not less 2 hours after update";
 
     Class<?>[] groups() default {};

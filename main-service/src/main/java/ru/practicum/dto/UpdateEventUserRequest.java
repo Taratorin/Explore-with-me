@@ -1,25 +1,30 @@
 package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-import ru.practicum.model.Location;
-import ru.practicum.model.StateAction;
-import ru.practicum.valid.EventDateValidByUserUpdate;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@EventDateValidByUserUpdate
-public class UpdateEventUserRequest {
-    @Length(min = 20, max = 2000)
-    private String annotation;
-    private Long category;
-    @Length(min = 20, max = 7000)
-    private String description;
-    private String eventDate;
-    private Location location;
-    private Boolean paid;
-    private Integer participantLimit;
-    private Boolean requestModeration;
+@AllArgsConstructor
+@NoArgsConstructor
+public class UpdateEventUserRequest extends UpdateEventRequest {
     private StateAction stateAction;
-    @Length(min = 3, max = 120)
-    private String title;
+
+    public enum StateAction {
+        SEND_TO_REVIEW,
+        CANCEL_REVIEW;
+
+        @JsonCreator
+        public static StateAction from(String stateAction) {
+            for (StateAction state : values()) {
+                if (state.name().equalsIgnoreCase(stateAction)) {
+                    return state;
+                }
+            }
+            return null;
+        }
+    }
 }

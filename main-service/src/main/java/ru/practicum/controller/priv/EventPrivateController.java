@@ -2,7 +2,7 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.*;
 import ru.practicum.service.EventService;
@@ -22,11 +22,12 @@ public class EventPrivateController {
     private final EventService eventService;
 
     @PostMapping()
-    public ResponseEntity<EventFullDto> saveNewEvent(@Valid @RequestBody NewEventDto newEventDto,
-                                     @PathVariable long userId,
-                                     HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — добавление нового события");
-        return ResponseEntity.status(201).body(eventService.saveNewEvent(newEventDto, userId));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventFullDto saveNewEvent(@Valid @RequestBody NewEventDto newEventDto,
+                                                     @PathVariable long userId,
+                                                     HttpServletRequest request) {
+        log.info("Получен запрос {} — добавление нового события", request.getRequestURI());
+        return eventService.saveNewEvent(newEventDto, userId);
     }
 
     @GetMapping()
@@ -34,16 +35,15 @@ public class EventPrivateController {
                                          @RequestParam(defaultValue = "0") int from,
                                          @RequestParam(defaultValue = "10") int size,
                                          HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — получение событий, " +
-                "добавленных текущим пользователем");
+        log.info("Получен запрос {} — получение событий, добавленных текущим пользователем", request.getRequestURI());
         return eventService.getEvents(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEvent(@PathVariable long userId, @PathVariable long eventId,
                                  HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — получение полной информации о событии, " +
-                "добавленном текущим пользователем");
+        log.info("Получен запрос {} — получение полной информации о событии, добавленном текущим пользователем",
+                request.getRequestURI());
         return eventService.getEvent(userId, eventId);
     }
 
@@ -51,16 +51,15 @@ public class EventPrivateController {
     public EventFullDto patchEvent(@Valid @RequestBody UpdateEventUserRequest updateEventUserRequest,
                                    @PathVariable long userId, @PathVariable long eventId,
                                    HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — изменение события, " +
-                "добавленного текущим пользователем");
+        log.info("Получен запрос {} — изменение события, добавленного текущим пользователем", request.getRequestURI());
         return eventService.patchEventUser(userId, eventId, updateEventUserRequest);
     }
 
     @GetMapping("/{eventId}/requests")
     public List<ParticipationRequestDto> getEventRequest(@PathVariable long userId, @PathVariable long eventId,
                                                          HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — получение информации о запросах на участие, " +
-                "в событии текущего пользователя");
+        log.info("Получен запрос {} — получение информации о запросах на участие, " +
+                "в событии текущего пользователя", request.getRequestURI());
         return eventService.getEventRequests(userId, eventId);
     }
 
@@ -69,9 +68,8 @@ public class EventPrivateController {
             @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest,
             @PathVariable long userId, @PathVariable long eventId,
             HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — изменение статуса заявок на участие, " +
-                "в событии текущего пользователя");
+        log.info("Получен запрос {} — изменение статуса заявок на участие, " +
+                "в событии текущего пользователя", request.getRequestURI());
         return eventService.patchEventRequests(userId, eventId, eventRequestStatusUpdateRequest);
     }
-
 }

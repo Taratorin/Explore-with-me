@@ -15,6 +15,7 @@ import ru.practicum.service.ParticipationRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,12 +30,12 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     public ParticipationRequestDto saveParticipationRequest(long userId, long eventId) {
         User requester = findUserById(userId);
         Event event = findEventById(eventId);
-        int confirmedRequests = event.getConfirmedRequests();
+        Integer confirmedRequests = participationRequestRepository.countConfirmedRequests(eventId);
+        event.setConfirmedRequests(Objects.requireNonNullElse(confirmedRequests, 0));
         requestValidation(event, requester);
         ParticipationRequest participationRequest = getParticipationRequest(requester, event);
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
             participationRequest.setStatus(Status.CONFIRMED);
-            event.setConfirmedRequests(confirmedRequests + 1);
         } else {
             participationRequest.setStatus(Status.PENDING);
         }
@@ -68,7 +69,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (event.getInitiator() == requester) {
             throw new ConflictException("Инициатор события не может добавить запрос на участие в своём событии");
         }
-//        List<ParticipationRequest> participationRequestByEvent = participationRequestRepository.findByEvent(event);
         if (event.getParticipantLimit() > 0 && event.getConfirmedRequests() == event.getParticipantLimit()) {
             throw new ConflictException("Достигнут лимит участников.");
         }

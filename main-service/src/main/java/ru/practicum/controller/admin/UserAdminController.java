@@ -2,7 +2,7 @@ package ru.practicum.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.UserDto;
@@ -22,25 +22,25 @@ public class UserAdminController {
     private final UserService userService;
 
     @PostMapping()
-    public ResponseEntity<UserDto> saveUser(@Validated @RequestBody UserDto userDto, HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — добавление пользователя");
-        return ResponseEntity.status(201).body(userService.saveUser(userDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto saveUser(@Validated @RequestBody UserDto userDto, HttpServletRequest request) {
+        log.info("Получен запрос {} — добавление пользователя", request.getRequestURI());
+        return userService.saveUser(userDto);
     }
 
     @GetMapping()
-    public ResponseEntity<List<UserDto>> findUsers(@RequestParam(required = false) List<Long> ids,
-                                                   @RequestParam(defaultValue = "0") int from,
-                                                   @RequestParam(defaultValue = "10") int size,
-                                                   HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — получение пользователей");
-        return ResponseEntity.status(200).body(userService.findUsers(ids, from, size));
+    public List<UserDto> findUsers(@RequestParam(required = false) List<Long> ids,
+                                   @RequestParam(defaultValue = "0") int from,
+                                   @RequestParam(defaultValue = "10") int size,
+                                   HttpServletRequest request) {
+        log.info("Получен запрос {} — получение пользователей", request.getRequestURI());
+        return userService.findUsers(ids, from, size);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable long userId, HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — удаление пользователя");
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable long userId, HttpServletRequest request) {
+        log.info("Получен запрос {} — удаление пользователя", request.getRequestURI());
         userService.deleteUser(userId);
-        return ResponseEntity.status(204).body(null);
     }
-
 }

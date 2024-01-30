@@ -1,25 +1,18 @@
 package ru.practicum.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-import ru.practicum.model.Location;
-import ru.practicum.model.StateAction;
-import ru.practicum.valid.EventDateValidByAdminUpdate;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@EventDateValidByAdminUpdate
-public class UpdateEventAdminRequest {
-    @Length(min = 20, max = 2000)
-    private String annotation;
-    private Long category;
-    @Length(min = 20, max = 7000)
-    private String description;
-    private String eventDate;
-    private Location location;
-    private Boolean paid;
-    private Integer participantLimit;
-    private Boolean requestModeration;
+@AllArgsConstructor
+@NoArgsConstructor
+public class UpdateEventAdminRequest extends UpdateEventRequest {
     private StateAction stateAction;
-    @Length(min = 3, max = 120)
-    private String title;
+
+    public enum StateAction {
+        PUBLISH_EVENT, REJECT_EVENT
+    }
 }

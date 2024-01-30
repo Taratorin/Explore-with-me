@@ -2,7 +2,7 @@ package ru.practicum.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
@@ -23,23 +23,24 @@ public class CompilationAdminController {
 private final CompilationService compilationService;
 
     @PostMapping()
-    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto,
-                                                          HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — добавление новой подборки событий");
-        return ResponseEntity.status(201).body(compilationService.saveCompilation(newCompilationDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CompilationDto saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto,
+                                          HttpServletRequest request) {
+        log.info("Получен запрос {} — добавление новой подборки событий", request.getRequestURI());
+        return compilationService.saveCompilation(newCompilationDto);
     }
 
     @DeleteMapping("/{compId}")
-    public ResponseEntity<?> deleteCompilation(@PathVariable long compId, HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — удаление подборки");
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable long compId, HttpServletRequest request) {
+        log.info("Получен запрос {} — удаление подборки", request.getRequestURI());
         compilationService.deleteCompilation(compId);
-        return ResponseEntity.status(204).body(null);
     }
 
     @PatchMapping("/{compId}")
     public CompilationDto patchCompilation(@RequestBody @Valid UpdateCompilationRequest updateCompilationRequest,
             @PathVariable Long compId, HttpServletRequest request) {
-        log.info("Получен запрос " + request.getRequestURI() + " — удаление подборки");
+        log.info("Получен запрос {} — удаление подборки", request.getRequestURI());
         return compilationService.patchCompilation(updateCompilationRequest, compId);
     }
 

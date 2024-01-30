@@ -15,15 +15,8 @@ import java.util.List;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler()
-    public ResponseEntity<ApiError> handleConstraintViolationException(final ConstraintViolationException e) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        HandleError result = getHandleError(e, httpStatus);
-        return ResponseEntity.status(result.httpStatus).body(result.error);
-    }
-
-    @ExceptionHandler()
-    public ResponseEntity<ApiError> handleBadRequestException(final BadRequestException e) {
+    @ExceptionHandler({ConstraintViolationException.class, BadRequestException.class})
+    public ResponseEntity<ApiError> handleConstraintViolationException(final RuntimeException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         HandleError result = getHandleError(e, httpStatus);
         return ResponseEntity.status(result.httpStatus).body(result.error);
@@ -65,38 +58,4 @@ public class ErrorHandler {
             this.error = error;
         }
     }
-
-//    @ExceptionHandler({MethodArgumentNotValidException.class, BadRequestException.class})
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleBadRequestException(final BadRequestException e) {
-//        log.trace("Получен статус 400 Bad request {}", e.getMessage(), e);
-//        return new ErrorResponse(e.getMessage());
-//    }
-//
-//
-//    @ExceptionHandler()
-//    @ResponseStatus(HttpStatus.NOT_FOUND)
-//    public ErrorResponse handleNotFoundException(final NotFoundException e) {
-//        log.trace("Получен статус 404 Not Found {}", e.getMessage(), e);
-//        return new ErrorResponse(e.getMessage());
-//    }
-//
-//    @ExceptionHandler()
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    public ErrorResponse handleForbiddenException(final ForbiddenException e) {
-//        log.trace("Получен статус 403 Forbidden {}", e.getMessage(), e);
-//        return new ErrorResponse(e.getMessage());
-//    }
-
-//    @ExceptionHandler()
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    public ResponseEntity<ApiError> handleThrowableException(final Throwable e) {
-//        log.trace("Получен статус 500 Internal Server Error {}", e.getMessage(), e);
-//        ApiError error = ApiError.builder()
-//                .errors(Collections.singletonList(e.getMessage()))
-//                .reason(e.getLocalizedMessage())
-//                .status(HttpStatus.NO_CONTENT)
-//                .build();
-//        return ResponseEntity.status(400).body(error);
-//    }
 }

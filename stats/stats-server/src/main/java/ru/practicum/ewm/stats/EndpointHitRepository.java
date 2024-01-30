@@ -2,14 +2,13 @@ package ru.practicum.ewm.stats;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import ru.practicum.ewm.dto.stats.ViewStatsDto;
 import ru.practicum.ewm.stats.entity.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long>, QuerydslPredicateExecutor<EndpointHit> {
+public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
     @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(ip)) " +
             "from EndpointHit " +

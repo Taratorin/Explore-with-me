@@ -7,8 +7,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
 
-import static ru.practicum.config.Constants.DATE_TIME_FORMATTER;
-
 public class CheckEventDate implements ConstraintValidator<EventDateValid, NewEventDto> {
     private static final Long HOURS_VALID_AFTER_CREATION = 2L;
 
@@ -18,10 +16,7 @@ public class CheckEventDate implements ConstraintValidator<EventDateValid, NewEv
 
     @Override
     public boolean isValid(NewEventDto newEventDto, ConstraintValidatorContext constraintValidatorContext) {
-        LocalDateTime eventDate = LocalDateTime.parse(newEventDto.getEventDate(), DATE_TIME_FORMATTER);
-        if (eventDate == null) {
-            return false;
-        }
+        LocalDateTime eventDate = newEventDto.getEventDate();
         return eventDate.isAfter(LocalDateTime.now().plusHours(HOURS_VALID_AFTER_CREATION));
     }
 }

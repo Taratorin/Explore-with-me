@@ -17,6 +17,7 @@ import ru.practicum.repository.EventRepository;
 import ru.practicum.service.CompilationService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,8 +38,8 @@ public class CompilationServiceImpl implements CompilationService {
             events = new ArrayList<>();
         }
         Compilation compilation = Compilation.builder()
-                .events(events)
-                .pinned(newCompilationDto.getPinned())
+                .events(new HashSet<>(events))
+                .pinned(newCompilationDto.isPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
         Compilation savedCompilation = compilationRepository.save(compilation);
@@ -54,20 +55,21 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto patchCompilation(UpdateCompilationRequest updateCompilationRequest, Long compId) {
         Compilation compilation = getCompilationById(compId);
-        List<Long> eventIds = updateCompilationRequest.getEvents();
-        List<Event> events;
+        Set<Long> eventIds = updateCompilationRequest.getEvents();
+        List<Event> eventsList;
         if (eventIds != null && !eventIds.isEmpty()) {
-            events = eventRepository.findAllById(eventIds);
+            eventsList = eventRepository.findAllById(eventIds);
         } else {
-            events = new ArrayList<>();
+            eventsList = new ArrayList<>();
         }
-        compilation.setEvents(events);
-        if (!(updateCompilationRequest.isPinned() && compilation.getPinned())) {
-            compilation.setPinned(updateCompilationRequest.isPinned());
+        compilation.setEvents(new HashSet<>(eventsList));
+        if (updateCompilationRequest.getPinned() != null &&
+                !(updateCompilationRequest.getPinned() && compilation.getPinned())) {
+            compilation.setPinned(updateCompilationRequest.getPinned());
         }
-        if (updateCompilationRequest.getTitle() != null &&
-                !updateCompilationRequest.getTitle().equals(compilation.getTitle())) {
-            compilation.setTitle(updateCompilationRequest.getTitle());
+        String title = updateCompilationRequest.getTitle();
+        if (title != null && !title.isBlank() && !title.equals(compilation.getTitle())) {
+            compilation.setTitle(title);
         }
         compilationRepository.save(compilation);
         return CompilationMapper.INSTANCE.toCompilationDto(compilation);

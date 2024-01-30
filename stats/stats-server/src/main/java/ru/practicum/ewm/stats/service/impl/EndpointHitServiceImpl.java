@@ -27,7 +27,7 @@ public class EndpointHitServiceImpl implements EndpointHitService {
     @Override
     public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (!unique) {
-            if (uris != null) {
+            if (!uris.isEmpty()) {
                 if (start != null) {
                     return endpointHitRepository.findByUriAllIp(uris, start, end);
                 } else {
@@ -41,7 +41,7 @@ public class EndpointHitServiceImpl implements EndpointHitService {
                 }
             }
         } else {
-            if (uris != null) {
+            if (!uris.isEmpty()) {
                 if (start != null) {
                     return endpointHitRepository.findByUriDistinctIp(uris, start, end);
                 } else {
@@ -56,31 +56,4 @@ public class EndpointHitServiceImpl implements EndpointHitService {
             }
         }
     }
-
-//    @Override
-//    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
-//        QEndpointHit endpointHit = QEndpointHit.endpointHit;
-//        List<BooleanExpression> conditions = new ArrayList<>();
-//        if (start != null) {
-//            conditions.add(endpointHit.ts.after(start));
-//        }
-//        if (end != null) {
-//            conditions.add(endpointHit.ts.before(start));
-//        }
-//        if (uris != null) {
-//            conditions.add(endpointHit.uri.in(uris));
-//        }
-//        if (unique) {
-//            conditions.add(endpointHit.ip.);
-//        }
-//
-//
-//        Optional<BooleanExpression> optionalCondition = conditions.stream().reduce(BooleanExpression::and);
-//        if (optionalCondition.isPresent()) {
-//            BooleanExpression finalCondition = optionalCondition.get();
-//            Iterable<EndpointHit> endpointHits = endpointHitRepository.findAll(finalCondition);
-//            List<ViewStatsDto> ViewStatsDto = new ArrayList<>();
-//
-//        }
-//    }
 }

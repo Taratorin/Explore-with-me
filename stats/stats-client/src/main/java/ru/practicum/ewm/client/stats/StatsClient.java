@@ -10,6 +10,9 @@ import ru.practicum.ewm.dto.stats.ViewStatsDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +20,9 @@ import java.util.Map;
 public class StatsClient extends BaseClient {
     private static final String API_PREFIX_POST = "/hit";
     private static final String API_PREFIX_GET = "/stats";
+    @Value("${app.name}")
+    private String appName;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
@@ -27,17 +33,42 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public void saveHit(HttpServletRequest request, String app, LocalDateTime ts) {
+    public void saveHit(HttpServletRequest request, LocalDateTime ts) {
         EndpointHitDto endpointHitDto = EndpointHitDto.builder()
                 .ip(request.getRemoteAddr())
                 .uri(request.getRequestURI())
-                .app(app)
+                .app(appName)
                 .timestamp(ts)
                 .build();
         post(API_PREFIX_POST, endpointHitDto);
     }
 
-    public List<ViewStatsDto> get(HttpServletRequest request, Map<String, String> parameters) {
+    public void saveHit(HttpServletRequest request, String uri, LocalDateTime ts) {
+        EndpointHitDto endpointHitDto = EndpointHitDto.builder()
+                .ip(request.getRemoteAddr())
+                .uri(uri)
+                .app(appName)
+                .timestamp(ts)
+                .build();
+        post(API_PREFIX_POST, endpointHitDto);
+    }
+
+    public List<ViewStatsDto> get(String uris, LocalDateTime start, LocalDateTime end) {
+        Map<String, Object> parameters = getParameters(uris, start, end);
         return get(API_PREFIX_GET + "?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+    }
+
+    private Map<String, Object> getParameters(String uris, LocalDateTime startLDT, LocalDateTime endLDT) {
+        List<String> urisList = new ArrayList<>(List.of(uris.split("&uris=")));
+        Map<String, Object> parameters = new HashMap<>();
+        for (String s : urisList) {
+            parameters.put("uris", s);
+        }
+        String start = startLDT.format(formatter);
+        String end = endLDT.format(formatter);
+        parameters.put("start", start);
+        parameters.put("end", end);
+        parameters.put("unique", "true");
+        return parameters;
     }
 }

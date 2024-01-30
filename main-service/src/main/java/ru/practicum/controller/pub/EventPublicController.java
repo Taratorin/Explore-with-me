@@ -43,4 +43,3 @@ public class EventPublicController {
         return eventService.findEventPublic(id, request);
     }
 }
-

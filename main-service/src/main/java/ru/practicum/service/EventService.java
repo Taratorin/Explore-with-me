@@ -24,7 +24,7 @@ public interface EventService {
     List<EventFullDto> findEventsByConditions(List<Long> userIds,
                                               List<State> states, List<Long> categories,
                                               LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                              int from, int size);
+                                              int from, int size, HttpServletRequest request);
 
     EventFullDto patchEventAdmin(long eventId, UpdateEventAdminRequest updateEventAdminRequest);
 

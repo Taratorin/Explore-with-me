@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 @Builder
 @Entity
 @Table(name = "events", schema = "public")
@@ -28,9 +27,6 @@ public class Event {
     private LocalDateTime createdOn;
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
-//    @ManyToOne
-//    @JoinColumn(name = "locations_id")
-//    private Location location;
     private float lat;
     private float lon;
     private Boolean paid;
@@ -44,7 +40,12 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
-    @Column(name = "confirmed_requests")
-    private int confirmedRequests;
+    @Transient
+    private Integer confirmedRequests;
+    @Transient
     private long views;
+
+    public String getUri() {
+        return "/events/" + id;
+    }
 }
