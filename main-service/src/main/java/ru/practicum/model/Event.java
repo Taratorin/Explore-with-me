@@ -1,6 +1,7 @@
 package ru.practicum.model;
 
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -40,7 +41,8 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
-    @Transient
+//    @Transient
+    @Formula(value = "(SELECT COUNT(pr.id) FROM participation_requests as pr WHERE pr.event_id = id AND pr.status LIKE 'CONFIRMED')")
     private Integer confirmedRequests;
     @Transient
     private long views;

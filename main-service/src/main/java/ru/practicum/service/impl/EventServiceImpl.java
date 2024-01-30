@@ -103,6 +103,7 @@ public class EventServiceImpl implements EventService {
             event.setState(State.CANCELED);
         } else if (UpdateEventAdminRequest.StateAction.PUBLISH_EVENT.equals(updateEventAdminRequest.getStateAction()) &&
                 event.getState().equals(State.PENDING)) {
+            event.setPublishedOn(LocalDateTime.now());
             event.setState(State.PUBLISHED);
         }
         EventMapper.INSTANCE.updateEventFromDto(updateEventAdminRequest, event);
@@ -293,13 +294,13 @@ public class EventServiceImpl implements EventService {
                 event.setViews(viewStatsDto.getHits());
             }
         }
-        for (Event event : events) {
-            Integer confirmed = participationRequestRepository.countConfirmedRequests(event.getId());
-            if (confirmed == null) {
-                confirmed = 0;
-            }
-            event.setConfirmedRequests(confirmed);
-        }
+//        for (Event event : events) {
+//            Integer confirmed = participationRequestRepository.countConfirmedRequests(event.getId());
+//            if (confirmed == null) {
+//                confirmed = 0;
+//            }
+//            event.setConfirmedRequests(confirmed);
+//        }
         return events.stream()
                 .map(EventMapper.INSTANCE::eventToEventFullDto)
                 .collect(Collectors.toList());
