@@ -25,7 +25,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
 
     @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(distinct ip)) " +
             "from EndpointHit " +
-            "where uri = ?1 " +
+            "where uri in (?1) " +
             "and ts between ?2 and ?3 " +
             "group by app, uri order by count(distinct ip) desc")
     List<ViewStatsDto> findByUriDistinctIp(List<String> uri, LocalDateTime start, LocalDateTime end);
@@ -49,7 +49,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
 
     @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(distinct ip)) " +
             "from EndpointHit " +
-            "where uri = ?1 " +
+            "where uri in (?1) " +
             "group by app, uri order by count(distinct ip) desc")
     List<ViewStatsDto> findByUriDistinctIpWithoutDates(List<String> uri);
 
