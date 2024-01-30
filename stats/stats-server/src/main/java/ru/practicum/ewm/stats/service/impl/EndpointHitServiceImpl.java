@@ -27,7 +27,7 @@ public class EndpointHitServiceImpl implements EndpointHitService {
     @Override
     public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (!unique) {
-            if (!uris.isEmpty()) {
+            if (uris != null && !uris.isEmpty()) {
                 if (start != null) {
                     return endpointHitRepository.findByUriAllIp(uris, start, end);
                 } else {
