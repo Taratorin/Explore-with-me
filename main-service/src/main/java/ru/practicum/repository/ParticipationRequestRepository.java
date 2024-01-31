@@ -1,7 +1,6 @@
 package ru.practicum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import ru.practicum.model.Event;
 import ru.practicum.model.ParticipationRequest;
