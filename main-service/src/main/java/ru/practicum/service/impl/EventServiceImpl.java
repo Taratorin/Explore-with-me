@@ -122,13 +122,7 @@ public class EventServiceImpl implements EventService {
                                                boolean onlyAvailable, LocalDateTime rangeStart,
                                                LocalDateTime rangeEnd, SortType sort, int from, int size,
                                                HttpServletRequest httpServletRequest) {
-        List<Event> availableEvents;
-        if (categories != null) {
-            availableEvents = eventRepository.findEventByCategoryIdInAndState(categories, State.PUBLISHED);
-        } else {
-            availableEvents = List.of();
-        }
-        if (availableEvents.isEmpty()) {
+        if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
             throw new BadRequestException("Event must be published");
         }
         QEvent event = QEvent.event;
@@ -139,7 +133,7 @@ public class EventServiceImpl implements EventService {
         if (text != null) {
             conditions.add(event.annotation.containsIgnoreCase(text).or(event.description.containsIgnoreCase(text)));
         }
-        if (!categories.isEmpty()) {
+        if (categories != null && !categories.isEmpty()) {
             conditions.add(event.category.id.in(categories));
         }
         if (paid) {
