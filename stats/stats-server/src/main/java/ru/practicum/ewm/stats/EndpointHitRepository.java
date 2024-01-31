@@ -23,10 +23,9 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
             "group by app, uri order by count(ip) desc")
     List<ViewStatsDto> findByEmptyUriAllIp(LocalDateTime start, LocalDateTime end);
 
-
     @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(distinct ip)) " +
             "from EndpointHit " +
-            "where uri = ?1 " +
+            "where uri in (?1) " +
             "and ts between ?2 and ?3 " +
             "group by app, uri order by count(distinct ip) desc")
     List<ViewStatsDto> findByUriDistinctIp(List<String> uri, LocalDateTime start, LocalDateTime end);
@@ -37,4 +36,25 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
             "group by app, uri order by count(distinct ip) desc")
     List<ViewStatsDto> findByEmptyUriDistinctIp(LocalDateTime start, LocalDateTime end);
 
+    @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(ip)) " +
+            "from EndpointHit " +
+            "where uri in (?1) " +
+            "group by app, uri order by count(ip) desc")
+    List<ViewStatsDto> findByUriAllIpWithoutDates(List<String> uri);
+
+    @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(ip)) " +
+            "from EndpointHit " +
+            "group by app, uri order by count(ip) desc")
+    List<ViewStatsDto> findByEmptyUriAllIpWithoutDates();
+
+    @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(distinct ip)) " +
+            "from EndpointHit " +
+            "where uri in (?1) " +
+            "group by app, uri order by count(distinct ip) desc")
+    List<ViewStatsDto> findByUriDistinctIpWithoutDates(List<String> uri);
+
+    @Query("select new ru.practicum.ewm.dto.stats.ViewStatsDto(app, uri, count(distinct ip)) " +
+            "from EndpointHit " +
+            "group by app, uri order by count(distinct ip) desc")
+    List<ViewStatsDto> findByEmptyUriDistinctIpWithoutDates();
 }

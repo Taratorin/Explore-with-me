@@ -10,7 +10,6 @@ import ru.practicum.ewm.stats.mapper.EndpointHitMapper;
 import ru.practicum.ewm.stats.service.EndpointHitService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,26 +18,41 @@ public class EndpointHitServiceImpl implements EndpointHitService {
     private final EndpointHitRepository endpointHitRepository;
 
     @Override
-    public void saveHit(EndpointHitDto endpointHitDto) {
+    public EndpointHitDto saveHit(EndpointHitDto endpointHitDto) {
         EndpointHit endpointHit = EndpointHitMapper.toEndpointHit(endpointHitDto);
-        endpointHitRepository.save(endpointHit);
+        EndpointHit saved = endpointHitRepository.save(endpointHit);
+        return EndpointHitMapper.toEndpointHitDto(saved);
     }
 
     @Override
-    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+    public List<ViewStatsDto> getHit(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (!unique) {
-            if (uris != null) {
-                List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriAllIp(urisList, start, end);
+            if (uris != null && !uris.isEmpty()) {
+                if (start != null) {
+                    return endpointHitRepository.findByUriAllIp(uris, start, end);
+                } else {
+                    return endpointHitRepository.findByUriAllIpWithoutDates(uris);
+                }
             } else {
-                return endpointHitRepository.findByEmptyUriAllIp(start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByEmptyUriAllIp(start, end);
+                } else {
+                    return endpointHitRepository.findByEmptyUriAllIpWithoutDates();
+                }
             }
         } else {
-            if (uris != null) {
-                List<String> urisList = new ArrayList<>(List.of(uris));
-                return endpointHitRepository.findByUriDistinctIp(urisList, start, end);
+            if (!uris.isEmpty()) {
+                if (start != null) {
+                    return endpointHitRepository.findByUriDistinctIp(uris, start, end);
+                } else {
+                    return endpointHitRepository.findByUriDistinctIpWithoutDates(uris);
+                }
             } else {
-                return endpointHitRepository.findByEmptyUriDistinctIp(start, end);
+                if (start != null) {
+                    return endpointHitRepository.findByEmptyUriDistinctIp(start, end);
+                } else {
+                    return endpointHitRepository.findByEmptyUriDistinctIpWithoutDates();
+                }
             }
         }
     }
