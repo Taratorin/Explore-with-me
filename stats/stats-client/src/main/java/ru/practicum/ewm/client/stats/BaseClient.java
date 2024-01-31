@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.ewm.dto.stats.ViewStatsDto;
+import ru.practicum.ewm.exception.BadRequestException;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class BaseClient {
                 serverResponse = rest.exchange(path, HttpMethod.GET, null, parameterizedTypeReference);
             }
         } catch (HttpStatusCodeException e) {
-            throw new RuntimeException(e.getStatusText());
+            throw new BadRequestException(e.getStatusText());
         }
         return serverResponse.getBody();
     }

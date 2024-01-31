@@ -258,11 +258,7 @@ public class EventServiceImpl implements EventService {
                 .map(Event::getCreatedOn)
                 .sorted()
                 .findFirst();
-        if (start.isEmpty()) {
-            for (Event event : events) {
-                event.setViews(0);
-            }
-        } else {
+        if (start.isPresent()) {
             LocalDateTime startLDT = start.get();
             List<String> urisList = new ArrayList<>();
             Map<String, Event> eventMap = events.stream()

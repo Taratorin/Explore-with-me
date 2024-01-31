@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConfirmedRequestsDto {
-    long confirmedRequests;
+    private long confirmedRequests;
 }
