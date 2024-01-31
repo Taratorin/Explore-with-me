@@ -41,7 +41,6 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
-//    @Transient
     @Formula(value = "(SELECT COUNT(pr.id) FROM participation_requests as pr WHERE pr.event_id = id AND pr.status LIKE 'CONFIRMED')")
     private Integer confirmedRequests;
     @Transient

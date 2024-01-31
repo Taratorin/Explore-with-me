@@ -22,15 +22,4 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     List<ParticipationRequest> findByEventAndIdIn(Event event, List<Long> ids);
 
-//    @Query("select new ru.practicum.dto.ConfirmedRequestsDto(count(?1)) " +
-//            "from ParticipationRequest " +
-//            "where status = 'CONFIRMED' " +
-//            "group by ?1")
-    @Query(value = "select count(?1) \n" +
-            "from participation_requests pr \n" +
-            "where pr.status = 'CONFIRMED'\n" +
-            "and pr.event_id = ?1 \n" +
-            "group by ?1",
-    nativeQuery = true)
-    Integer countConfirmedRequests(long eventId);
 }

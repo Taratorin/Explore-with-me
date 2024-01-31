@@ -165,12 +165,7 @@ public class EventServiceImpl implements EventService {
         Page<Event> eventsPage = eventRepository.findAll(finalCondition, pageRequest);
         List<Event> events = eventsPage.stream().collect(Collectors.toList());
         if (onlyAvailable) {
-            for (Event e : events) {
-                Integer confirmedRequests = participationRequestRepository.countConfirmedRequests(e.getId());
-                if (confirmedRequests == e.getParticipantLimit()) {
-                    events.remove(e);
-                }
-            }
+            events.removeIf(e -> e.getConfirmedRequests() == e.getParticipantLimit());
         }
         List<EventShortDto> eventShortDtos = new ArrayList<>();
         for (Event e : events) {
@@ -213,11 +208,6 @@ public class EventServiceImpl implements EventService {
             EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         User initiator = findUserById(userId);
         Event event = findEventById(eventId);
-        Integer confirmed = participationRequestRepository.countConfirmedRequests(eventId);
-        if (confirmed == null) {
-            confirmed = 0;
-        }
-        event.setConfirmedRequests(confirmed);
         if (event.getInitiator() != initiator) {
             throw new BadRequestException("Для изменения статуса заявок вы должны быть инициатором события.");
         }
@@ -232,10 +222,9 @@ public class EventServiceImpl implements EventService {
                 throw new ConflictException("Статус можно изменить только у заявок, находящихся в состоянии ожидания");
             }
             EventRequestStatusUpdateRequest.Status status = eventRequestStatusUpdateRequest.getStatus();
-            if (event.getParticipantLimit() > confirmed &&
+            if (event.getParticipantLimit() > event.getConfirmedRequests() &&
                     EventRequestStatusUpdateRequest.Status.CONFIRMED.equals(status)) {
                 participationRequest.setStatus(Status.CONFIRMED);
-                event.setConfirmedRequests(confirmed + 1);
                 result.getConfirmedRequests()
                         .add(ParticipationRequestMapper.INSTANCE
                                 .participationRequestToParticipationRequestDto(participationRequest));
@@ -288,13 +277,6 @@ public class EventServiceImpl implements EventService {
                 event.setViews(viewStatsDto.getHits());
             }
         }
-//        for (Event event : events) {
-//            Integer confirmed = participationRequestRepository.countConfirmedRequests(event.getId());
-//            if (confirmed == null) {
-//                confirmed = 0;
-//            }
-//            event.setConfirmedRequests(confirmed);
-//        }
         return events.stream()
                 .map(EventMapper.INSTANCE::eventToEventFullDto)
                 .collect(Collectors.toList());

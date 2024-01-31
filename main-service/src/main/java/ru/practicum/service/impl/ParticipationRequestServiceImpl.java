@@ -30,8 +30,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     public ParticipationRequestDto saveParticipationRequest(long userId, long eventId) {
         User requester = findUserById(userId);
         Event event = findEventById(eventId);
-        Integer confirmedRequests = participationRequestRepository.countConfirmedRequests(eventId);
-        event.setConfirmedRequests(Objects.requireNonNullElse(confirmedRequests, 0));
         requestValidation(event, requester);
         ParticipationRequest participationRequest = getParticipationRequest(requester, event);
         if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
