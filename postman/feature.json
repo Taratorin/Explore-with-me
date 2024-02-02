@@ -390,7 +390,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/1/comments?eventId=100",
+					"raw": "{{baseUrl}}/users/1/comments?eventId=10000",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -402,7 +402,7 @@
 					"query": [
 						{
 							"key": "eventId",
-							"value": "100"
+							"value": "10000"
 						}
 					]
 				}
@@ -437,13 +437,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/100/comments?eventId=1",
+					"raw": "{{baseUrl}}/users/10000/comments?eventId=1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
-						"100",
+						"10000",
 						"comments"
 					],
 					"query": [
@@ -672,13 +672,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/100/comments/1",
+					"raw": "{{baseUrl}}/users/10000/comments/1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
-						"100",
+						"10000",
 						"comments",
 						"1"
 					]
