@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FullEventCommentDto {
-    private long Id;
+    private long id;
     private String title;
     private String text;
     private UserShortDto author;

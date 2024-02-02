@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComplaintDto {
-    private Long Id;
+    private Long id;
     @Length(min = 10, max = 200)
     @NotBlank
     private String text;
