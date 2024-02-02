@@ -5,6 +5,7 @@ import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,6 +46,9 @@ public class Event {
     private Integer confirmedRequests;
     @Transient
     private long views;
+    @Transient
+    @Formula(value = "(SELECT * FROM comments WHERE event_id = id")
+    private List<EventComment> eventComments;
 
     public String getUri() {
         return "/events/" + id;

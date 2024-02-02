@@ -19,7 +19,7 @@ public class Compilation {
     private Long id;
     @ElementCollection
     @CollectionTable(name = "events_compilations", joinColumns = @JoinColumn(name = "compilation"))
-    @Column(name = "events_id")
+    @Column(name = "event_id")
     private Set<Event> events;
     private Boolean pinned;
     private String title;
