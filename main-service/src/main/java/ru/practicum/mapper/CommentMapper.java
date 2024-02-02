@@ -5,7 +5,6 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.dto.FullEventCommentDto;
-import ru.practicum.dto.NewEventCommentDto;
 import ru.practicum.dto.UpdateEventCommentDto;
 import ru.practicum.model.EventComment;
 

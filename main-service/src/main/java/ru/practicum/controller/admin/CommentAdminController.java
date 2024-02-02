@@ -2,21 +2,12 @@ package ru.practicum.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.ComplaintDto;
 import ru.practicum.dto.FullEventCommentDto;
-import ru.practicum.dto.NewCategoryDto;
-import ru.practicum.model.Complaint;
-import ru.practicum.model.EventComment;
-import ru.practicum.model.StateComplaint;
-import ru.practicum.service.CategoryService;
 import ru.practicum.service.CommentService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import java.util.List;
 
 import static ru.practicum.config.Constants.ADMIN_CONTROLLER_PREFIX;

@@ -1,6 +1,5 @@
 package ru.practicum.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
