@@ -1,6 +1,5 @@
 package ru.practicum.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,15 +15,5 @@ public class UpdateEventUserRequest extends UpdateEventRequest {
     public enum StateAction {
         SEND_TO_REVIEW,
         CANCEL_REVIEW;
-
-        @JsonCreator
-        public static StateAction from(String stateAction) {
-            for (StateAction state : values()) {
-                if (state.name().equalsIgnoreCase(stateAction)) {
-                    return state;
-                }
-            }
-            return null;
-        }
     }
 }
