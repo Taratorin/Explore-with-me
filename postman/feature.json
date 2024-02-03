@@ -1158,13 +1158,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/1/comments/1?like=LIKE-DISLIKE",
+					"raw": "{{baseUrl}}/users/3/comments/1?like=LIKE-DISLIKE",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"users",
-						"1",
+						"3",
 						"comments",
 						"1"
 					],
@@ -1318,7 +1318,7 @@
 							"pm.test(\"Test comment 'dislikes' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.have.property('dislikes');\r",
-							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be 1').to.eql(1);\r",
+							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be -1').to.eql(-1);\r",
 							"});\r",
 							"pm.test(\"Test comment 'rating' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
@@ -1411,7 +1411,7 @@
 							"pm.test(\"Test comment 'dislikes' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.have.property('dislikes');\r",
-							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be 1').to.eql(1);\r",
+							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be -1').to.eql(-1);\r",
 							"});\r",
 							"pm.test(\"Test comment 'rating' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
@@ -1597,7 +1597,7 @@
 							"pm.test(\"Test comment 'dislikes' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.have.property('dislikes');\r",
-							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be 1').to.eql(1);\r",
+							"    pm.expect(jsonData.dislikes, '\"dislikes\" must be -1').to.eql(-1);\r",
 							"});\r",
 							"pm.test(\"Test comment 'rating' field\", function () {\r",
 							"    var jsonData = pm.response.json();\r",
