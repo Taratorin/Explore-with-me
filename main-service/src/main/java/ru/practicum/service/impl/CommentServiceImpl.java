@@ -133,12 +133,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment.getAuthor().equals(user)) {
             throw new ConflictException("Нельзя оценивать собственные комментарии.");
         }
-        int likeInt;
-        if (likeString.equals(LikeStatus.LIKE.toString())) {
-            likeInt = 1;
-        } else {
-            likeInt = -1;
-        }
+        int likeInt = LikeStatus.getStatusInt(likeString);
         Like like = likeRepository.findByCommentAndUser(comment, user)
                 .orElse(new Like(null, comment, user, likeInt));
         if (like.getLike() == likeInt && like.getId() != null) {
@@ -151,7 +146,9 @@ public class CommentServiceImpl implements CommentService {
         }
         commentRepository.save(comment);
         em.clear();
-        return CommentMapper.INSTANCE.toFullEventCommentDto(commentRepository.findById(commentId).get());
+        EventComment commentUpdated = commentRepository.findById(commentId).get();
+        EventComment completed = completeComment(commentUpdated);
+        return CommentMapper.INSTANCE.toFullEventCommentDto(completed);
     }
 
     @Override
@@ -198,8 +195,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private EventComment findCommentById(long commentId) {
-        return commentRepository.findById(commentId)
+        EventComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Комментарий с id=" + commentId + " не найден."));
+        return completeComment(comment);
+    }
+
+    private EventComment completeComment(EventComment comment) {
+        CommentLikes commentLikes = likeRepository.getCommentLikesByComment(comment);
+        if (commentLikes != null) {
+            comment.setLikes(commentLikes.getLikes());
+            comment.setDislikes(commentLikes.getDislikes());
+            comment.setRating(commentLikes.getRating());
+        }
+        return comment;
     }
 
     private Complaint findComplaintById(long complaintId) {

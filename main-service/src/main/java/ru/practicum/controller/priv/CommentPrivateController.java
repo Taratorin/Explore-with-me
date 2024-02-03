@@ -9,7 +9,6 @@ import ru.practicum.dto.ComplaintDto;
 import ru.practicum.dto.FullEventCommentDto;
 import ru.practicum.dto.NewEventCommentDto;
 import ru.practicum.dto.UpdateEventCommentDto;
-import ru.practicum.model.LikeStatus;
 import ru.practicum.service.CommentService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +73,6 @@ public class CommentPrivateController {
                          HttpServletRequest request) {
         log.info("Получен запрос {} — добавление/удаление лайка текущего пользователя к комментарию",
                 request.getRequestURI());
-        LikeStatus.isPresent(like);
         return commentService.saveLike(userId, commentId, like);
     }
 

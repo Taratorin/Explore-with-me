@@ -3,7 +3,6 @@ package ru.practicum.model;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -30,11 +29,11 @@ public class EventComment {
     private String title;
     private String text;
     private LocalDateTime ts;
-    @Formula(value = "(SELECT COUNT(l.user_id) FROM likes as l WHERE l.comment_id = id AND l.like_dislike = 1)")
+    @Transient
     private Long likes;
-    @Formula(value = "(SELECT COUNT(l.user_id) FROM likes as l WHERE l.comment_id = id AND l.like_dislike = -1)")
+    @Transient
     private Long dislikes;
-    @Formula(value = "(SELECT SUM(l.like_dislike) FROM likes as l WHERE l.comment_id = id)")
+    @Transient
     private Long rating;
     @Column(name = "is_edited")
     private Boolean isEdited;
